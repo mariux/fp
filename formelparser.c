@@ -17,25 +17,25 @@
 /*
  * functions
  */
-int isnumber(char c);   /* 58 */
-int isvariable(char c); /* 69 */
-int isoperator(char c); /* 80 */
-int isbracket(char c);  /* 91 */
-struct Node *T(struct String *string);   /* 100 */
-struct Node *S(struct String *string);   /* 143 */
-struct Node *P(struct String *string);   /* 175 */
-struct Node *O(struct String *string);   /* 220 */
-struct Node *K(struct String *string);   /* 252 */
-struct Node *Num(struct String *string); /* 298 */
-struct Node *N(struct String *string);   /* 345 */
-struct Node *Z(struct String *string);   /* 381 */
-struct Node *Var(struct String *string); /* 411 */
-struct Node *B(struct String *string);   /* 440 */
-struct Node *create_parse_tree(struct String *string); /* 460 */
-long double calculate_parse_tree(struct Node *root);   /* 503 */
-int count_numerics(int number); /* 487 */
-void reduce(struct Node *root); /* 774 */
-void print_usage(); /* 978 */
+int isnumber(char c);
+int isvariable(char c);
+int isoperator(char c);
+int isbracket(char c);
+struct Node *T(struct String *string);
+struct Node *S(struct String *string);
+struct Node *P(struct String *string);
+struct Node *O(struct String *string);
+struct Node *K(struct String *string);
+struct Node *Num(struct String *string);
+struct Node *N(struct String *string);
+struct Node *Z(struct String *string);
+struct Node *Var(struct String *string);
+struct Node *B(struct String *string);
+struct Node *create_parse_tree(struct String *string);
+long double calculate_parse_tree(struct Node *root);
+int count_numerics(int number);
+void reduce(struct Node *root);
+void print_usage();
 
 /*
  * Grammar:
