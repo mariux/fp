@@ -41,17 +41,17 @@
 int isvariable(char c);
 int isoperator(char c);
 int isbracket(char c);
-struct Node *T(struct String *string);
-struct Node *S(struct String *string);
-struct Node *P(struct String *string);
-struct Node *O(struct String *string);
-struct Node *K(struct String *string);
-struct Node *Num(struct String *string);
-struct Node *N(struct String *string);
-struct Node *Z(struct String *string);
-struct Node *Var(struct String *string);
-struct Node *B(struct String *string);
-struct Node *create_parse_tree(struct String *string);
+GRAMMAR_PARSER(T);
+GRAMMAR_PARSER(S);
+GRAMMAR_PARSER(P);
+GRAMMAR_PARSER(O);
+GRAMMAR_PARSER(K);
+GRAMMAR_PARSER(Num);
+GRAMMAR_PARSER(N);
+GRAMMAR_PARSER(Z);
+GRAMMAR_PARSER(Var);
+GRAMMAR_PARSER(B);
+struct Node *create_parse_tree(struct String *tokens);
 long double calculate_parse_tree(struct Node *root);
 int count_numerics(int number);
 void reduce(struct Node *root);
@@ -97,7 +97,7 @@ int isoperator(char c)
  * function for conditional expression operators
  * T -> S | S '?' S ':' S
  */
-struct Node *T(struct String *tokens)
+GRAMMAR_PARSER(T)
 {
     struct Node *condition, *true, *false, *op;
     
@@ -106,20 +106,20 @@ struct Node *T(struct String *tokens)
     if(condition == NULL)
         return(NULL);
     
-    while(*(tokens->current) == '?') {
+    while(CURRENT_TOKEN == '?') {
         op = new_ternary_node();
         
-        next_char(tokens);
+        SKIP_TOKEN;
         
         true = S(tokens);
         
-        if(*(tokens->current) != ':' || true == NULL) {
+        if(CURRENT_TOKEN != ':' || true == NULL) {
             delete_node(op);
             delete_tree(condition);
             return(NULL);
         }
         
-        next_char(tokens);
+        SKIP_TOKEN;
         
         false = S(tokens);
         
@@ -175,7 +175,7 @@ GRAMMAR_PARSER(S)
  * function for multiplication and division signs
  * P -> O | O '*' O | O '/' O | OVar
  */
-struct Node *P(struct String *tokens)
+GRAMMAR_PARSER(P)
 {
     struct Node *subtree, *subtree2, *op;
     
@@ -184,7 +184,7 @@ struct Node *P(struct String *tokens)
     if(subtree == NULL)
         return(NULL);
     
-    while(isvariable(*(tokens->current))) {
+    while(isvariable(CURRENT_TOKEN)) {
         subtree2 = Var(tokens);
         
         if(subtree2 == NULL) {
@@ -197,10 +197,10 @@ struct Node *P(struct String *tokens)
         subtree = set_childs(op, subtree, subtree2);
     }
     
-    while(*(tokens->current) == '*' || *(tokens->current) == '/') {
-        op = new_operator_node(*(tokens->current));
+    while(CURRENT_TOKEN == '*' || CURRENT_TOKEN == '/') {
+        op = new_operator_node(CURRENT_TOKEN);
         
-        next_char(tokens);
+        SKIP_TOKEN;
         
         subtree2 = O(tokens);
         
@@ -220,7 +220,7 @@ struct Node *P(struct String *tokens)
  * function for exponentiations
  * O -> K | K '^' K
  */
-struct Node *O(struct String *tokens)
+GRAMMAR_PARSER(O)
 {
     struct Node *subtree, *subtree2, *op;
     
@@ -229,10 +229,10 @@ struct Node *O(struct String *tokens)
     if(subtree == NULL)
         return(NULL);
     
-    while(*(tokens->current) == '^') {
+    while(CURRENT_TOKEN == '^') {
         op = new_operator_node('^');
         
-        next_char(tokens);
+        SKIP_TOKEN;
         
         subtree2 = K(tokens);
         
@@ -317,7 +317,7 @@ GRAMMAR_PARSER(K)
  * function for numbers (maybe with an "E")
  * Num -> N | N 'E' Z | N 'E' '-' Z
  */
-struct Node *Num(struct String *tokens)
+GRAMMAR_PARSER(Num)
 {
     struct Node *subtree, *subtree2;
     
@@ -326,12 +326,14 @@ struct Node *Num(struct String *tokens)
     if(subtree == NULL)
         return(NULL);
     
-    if(*(tokens->current) == 'E') {
-        next_char(tokens); /* skip E symbol */
-        
-        if(*(tokens->current) == '-') {
-            next_char(tokens); /* skip subtraction sign */
-            
+    if(CURRENT_TOKEN == 'E') {
+        /* skip E symbol */
+        SKIP_TOKEN;        
+
+        if(CURRENT_TOKEN == '-') {
+            /* skip subtraction sign */
+            SKIP_TOKEN;            
+
             subtree2 = Z(tokens); /* get number */
             
             if(subtree2 == NULL) {
@@ -364,7 +366,7 @@ struct Node *Num(struct String *tokens)
  * function for numbers
  * N -> Z | Z '.' Z
  */
-struct Node *N(struct String *tokens)
+GRAMMAR_PARSER(N)
 {
     struct Node *subtree;
     long double nr;
@@ -375,18 +377,19 @@ struct Node *N(struct String *tokens)
     if(subtree == NULL)
         return(NULL);
     
-    if(*(tokens->current) == '.' || *(tokens->current) == ',') {
-        next_char(tokens); /* skip point */
-        
+    if(CURRENT_TOKEN == '.' || CURRENT_TOKEN == ',') {
+        /* skip point */
+        SKIP_TOKEN;        
+
         nr = subtree->data.value;
         digits = 0;
         
-        while(isdigit(*(tokens->current))) {
+        while(isdigit(CURRENT_TOKEN)) {
             digits++;
             
-            nr += (*(tokens->current) - '0') / pow(10.0, digits);
+            nr += (CURRENT_TOKEN - '0') / pow(10.0, digits);
             
-            next_char(tokens);
+            SKIP_TOKEN;
         }
         
         subtree->data.value = nr;
@@ -399,7 +402,7 @@ struct Node *N(struct String *tokens)
  * function for digits
  * Z -> [0-9]+
  */
-struct Node *Z(struct String *string)
+GRAMMAR_PARSER(Z)
 {
     struct Node *subtree;
     int digits;
@@ -409,12 +412,12 @@ struct Node *Z(struct String *string)
     digits = 0;
     number = 0.0;
     
-    while(isdigit(*(string->current))) {
+    while(isdigit(CURRENT_TOKEN)) {
         digits = 1;
         
-        number = number * 10.0 + (*(string->current) - '0');
+        number = number * 10.0 + (CURRENT_TOKEN - '0');
         
-        next_char(string);
+        SKIP_TOKEN;
     }
     
     if(!digits)
@@ -429,17 +432,17 @@ struct Node *Z(struct String *string)
  * function for variables
  * Var -> B | BZ
  */
-struct Node *Var(struct String *string)
+GRAMMAR_PARSER(Var)
 {
     struct Node *subtree, *subtree2, *op;
     
-    subtree = B(string);
+    subtree = B(tokens);
         
     if(subtree == NULL)
         return(NULL);
     
-    if(isdigit(*(string->current))) {
-        subtree2 = Z(string);
+    if(isdigit(CURRENT_TOKEN)) {
+        subtree2 = Z(tokens);
         
         if(subtree2 == NULL) {
             delete_tree(subtree);
@@ -458,16 +461,16 @@ struct Node *Var(struct String *string)
  * function for characters
  * B -> [a-z]
  */
-struct Node *B(struct String *string)
+GRAMMAR_PARSER(B)
 {
     struct Node *subtree;
     
     subtree = NULL;
     
-    if(isvariable(*(string->current))) {
-        subtree = new_variable_node(*(string->current));
+    if(isvariable(CURRENT_TOKEN)) {
+        subtree = new_variable_node(CURRENT_TOKEN);
         
-        next_char(string);
+        SKIP_TOKEN;
     }
     
     return(subtree);
@@ -478,25 +481,25 @@ struct Node *B(struct String *string)
  * 1. argument: tokens of a string
  * return value: the parse tree
  */
-struct Node *create_parse_tree(struct String *string)
+struct Node *create_parse_tree(struct String *tokens)
 {
     struct Node *parse_tree;
     
-    string->current = string->str;
+    tokens->current = tokens->str;
     
-    parse_tree = T(string);
+    parse_tree = T(tokens);
     
-    if(*(string->current) != '\0') {
+    if(CURRENT_TOKEN != '\0') {
 
 #ifdef DEBUG
         print_tree(parse_tree);
 #endif
 
-        printf("syntax error at position %d near '%c'\n", string->i, *(string->current));
+        printf("syntax error at position %d near '%c'\n", tokens->i, CURRENT_TOKEN);
         delete_tree(parse_tree);
         return(NULL);
     } else {
-        if(*(string->current) == '\0' && parse_tree == NULL)
+        if(CURRENT_TOKEN == '\0' && parse_tree == NULL)
             printf("syntax error at end of term\n");
     }
     
