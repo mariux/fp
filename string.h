@@ -17,12 +17,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h> /* fuer malloc/free */
-#include <stdio.h>  /* fuer perror/printf */
-#include <string.h> /* fuer strlen */
-
 #ifndef STRING_H
 #define STRING_H
+
+#define CURRENT_TOKEN (*(tokens->current))
+#define SKIP_TOKEN    next_char(tokens)
+
+#define GRAMMAR_PARSER(X)     struct Node *X(struct String *tokens)
 
 struct String {
     char *current;

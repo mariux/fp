@@ -140,29 +140,32 @@ struct Node *T(struct String *tokens)
  * function for addition and subtraction signs
  * S -> P | P '+' P | P '-' P
  */
-struct Node *S(struct String *tokens)
+GRAMMAR_PARSER(S)
 {
-    struct Node *subtree, *subtree2, *op;
+    struct Node *subtree, 
+                *right, 
+		*op;
     
     subtree = P(tokens);
     
-    if(subtree == NULL)
+    if(!subtree)
         return(NULL);
     
-    while(*(tokens->current) == '+' || (*tokens->current) == '-') {
-        op = new_operator_node(*(tokens->current));
+    while(CURRENT_TOKEN == '+' || CURRENT_TOKEN == '-') {
+        op = new_operator_node(CURRENT_TOKEN);
         
-        next_char(tokens);
+        SKIP_TOKEN;
         
-        subtree2 = P(tokens);
+        right = P(tokens);
         
-        if(subtree2 == NULL) {
+        if(!right) {
+	    /* cleanup and return Error */
             delete_node(op);
             delete_tree(subtree);
             return(NULL);
         }
         
-        subtree = set_childs(op, subtree, subtree2);
+        subtree = set_childs(op, subtree, right);
     }
     
     return(subtree);
@@ -246,54 +249,68 @@ struct Node *O(struct String *tokens)
 }
 
 /*
- * function for brackets and signed numbers or variables
+ * function for braces and signed numbers or variables
  * K -> (T) | -(T) | Num | -Num | Var | -Var
+ *
+ * that sounds wrong since the function does something like:
+ *
+ * K -> -K | (T) | Num | Var
  */
-struct Node *K(struct String *string)
+GRAMMAR_PARSER(K)
 {
-    struct Node *subtree, *subtree2, *op;
+    struct Node *subtree, 
+                *minusone, 
+		*op;
     
-    subtree = NULL;
-    
-    if(*(string->current) == '(') {
-        next_char(string);
+    /* K -> -K */
+    if(CURRENT_TOKEN == '-') {
+        SKIP_TOKEN;
+
+        subtree = K(tokens);
+
+        if(!subtree)
+            return(NULL);
+
+        op       = new_operator_node('*');
+        minusone = new_number_node(-1);
+        subtree  = set_childs(op, minusone, subtree);
+	return(subtree);
+    }
+
+    /* K -> (T) */
+    if(CURRENT_TOKEN == '(') {
+        SKIP_TOKEN;
         
-        subtree = T(string);
+        subtree = T(tokens);
         
-        if(subtree == NULL)
+        if(!subtree)
             return(NULL);
         
-        if(*(string->current) != ')' || subtree == NULL) {
-            delete_tree(subtree);
-            return(NULL);
-        }
-        
-        next_char(string); /* skip bracket */
-    } else {
-        if(*(string->current) == '-') {
-            next_char(string);
-        
-            subtree = K(string);
-            
-            if(subtree == NULL)
-                return(NULL);
-            
-            op = new_operator_node('*');
-            
-            subtree2 = new_number_node(-1);
-            
-            subtree = set_childs(op, subtree2, subtree);
-        } else {
-            if(isdigit(*(string->current)))
-                subtree = Num(string);
-            else {
-                if(isvariable(*(string->current)))
-                    subtree = Var(string);
-            }
-        }
+        if(CURRENT_TOKEN == ')') {
+	    SKIP_TOKEN;
+	    return(subtree);
+	}
+	
+	/* cleanup and return Error */
+        delete_tree(subtree);
+        return(NULL);
     }
     
-    return(subtree);
+    
+    /* K -> Num */
+    if(isdigit(CURRENT_TOKEN)) {
+	subtree = Num(tokens); 
+	return(subtree);
+    }
+    
+    /* K -> Var */
+    if(isvariable(CURRENT_TOKEN)) {
+        subtree = Var(tokens);
+	return(subtree);
+    }
+    
+    /* Syntax Error */
+    return(NULL);
 }
 
 /*
