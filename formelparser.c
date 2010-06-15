@@ -22,6 +22,8 @@
 #include <limits.h> /* for MAX_INPUT/LINE_MAX */
 #include <math.h>   /* for pow */
 #include <unistd.h> /* for getopt/optopt/optarg */
+#include <ctype.h>  /* isdigit() */
+
 
 /* #define DEBUG */
 
@@ -36,7 +38,6 @@
 /*
  * functions
  */
-int isnumber(char c);
 int isvariable(char c);
 int isoperator(char c);
 int isbracket(char c);
@@ -71,17 +72,6 @@ void print_usage();
  */
 
 /*
- * function checks if a character is a number
- * 1. argument: a character
- * return value: 0 if character is not a number
- *               1 if character is a number
- */
-int isnumber(char c)
-{
-    return(c >= '0' && c <= '9');
-}
-
-/*
  * function checks if a character is a variable
  * 1. argument: a character
  * return value: 0 if character is not a variable
@@ -101,17 +91,6 @@ int isvariable(char c)
 int isoperator(char c)
 {
     return(atoo(c) != ERROR);
-}
-
-/*
- * function checks if a character is a bracket
- * 1. argument: a character
- * return value: 0 if character is not a bracket
- *               1 if character is a bracket
- */
-int isbracket(char c)
-{
-    return(c == '(' || c == ')');
 }
 
 /*
@@ -305,7 +284,7 @@ struct Node *K(struct String *string)
             
             subtree = set_childs(op, subtree2, subtree);
         } else {
-            if(isnumber(*(string->current)))
+            if(isdigit(*(string->current)))
                 subtree = Num(string);
             else {
                 if(isvariable(*(string->current)))
@@ -385,7 +364,7 @@ struct Node *N(struct String *tokens)
         nr = subtree->data.value;
         digits = 0;
         
-        while(isnumber(*(tokens->current))) {
+        while(isdigit(*(tokens->current))) {
             digits++;
             
             nr += (*(tokens->current) - '0') / pow(10.0, digits);
@@ -413,7 +392,7 @@ struct Node *Z(struct String *string)
     digits = 0;
     number = 0.0;
     
-    while(isnumber(*(string->current))) {
+    while(isdigit(*(string->current))) {
         digits = 1;
         
         number = number * 10.0 + (*(string->current) - '0');
@@ -442,7 +421,7 @@ struct Node *Var(struct String *string)
     if(subtree == NULL)
         return(NULL);
     
-    if(isnumber(*(string->current))) {
+    if(isdigit(*(string->current))) {
         subtree2 = Z(string);
         
         if(subtree2 == NULL) {
