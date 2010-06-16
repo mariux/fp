@@ -106,16 +106,17 @@ void delete_tree(struct Node *old)
         case OPERATOR:
             delete_tree(old->data.op.left);
             delete_tree(old->data.op.right);
-        break;
+            break;
         
         case CONDITIONAL:
             delete_tree(old->data.con.condition);
             delete_tree(old->data.con.true);
             delete_tree(old->data.con.false);
+	    break;
         
         case ERROR:
             printf("ERROR\n");
-        break;
+            break;
     }
     
     /* leaf */
