@@ -106,16 +106,25 @@ GRAMMAR_PARSER(T)
     
     condition = S(tokens);
     
-    if(condition == NULL)
+    if(condition == NULL) {
+        /* syntax error in S -> return error */
         return(NULL);
+    }
     
     while(CURRENT_TOKEN == '?') {
         SKIP_TOKEN;
         
         true = S(tokens);
         
-        if(CURRENT_TOKEN != ':' || true == NULL) {
-            /* syntax error when parsing true or -> cleanup -> error */
+        if(true == NULL) {
+            /* syntax error in S -> cleanup -> return error */
+            delete_tree(condition);
+            return(NULL);
+        }
+        
+        if(CURRENT_TOKEN != ':') {
+            /* local syntax error -> cleanup -> return error */
+            delete_tree(true);
             delete_tree(condition);
             return(NULL);
         }
@@ -125,7 +134,7 @@ GRAMMAR_PARSER(T)
         false = S(tokens);
         
         if(false == NULL) {
-	    /* syntax error when parsing false -> cleanup -> error */
+            /* syntax error in S -> cleanup -> return error */
             delete_tree(condition);
             delete_tree(true);
             return(NULL);
