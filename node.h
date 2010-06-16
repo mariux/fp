@@ -68,12 +68,11 @@ struct Node {
 extern struct Node *new_operator_node(char op);
 extern struct Node *new_variable_node(char var);
 extern struct Node *new_number_node(double nr);
-extern struct Node *new_ternary_node(void);
+extern struct Node *new_conditional_node(struct Node *, struct Node *, struct Node *);
 extern struct Node *new_node(void);
 extern void delete_node(struct Node *old);
 extern void delete_tree(struct Node *old);
 extern struct Node *set_childs(struct Node *root, struct Node *left, struct Node *right);
-extern struct Node *set_3childs(struct Node *root, struct Node *cond, struct Node *t, struct Node *f);
 extern char otoa(int operator);
 extern int atoo(char op);
 extern int cmp_nodes(struct Node *n1, struct Node *n2);

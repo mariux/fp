@@ -75,18 +75,18 @@ struct Node *new_number_node(double nr)
     return(n);
 }
 
-struct Node *new_ternary_node(void)
+struct Node *new_conditional_node(struct Node *condition, struct Node *true, struct Node *false)
 {
-    struct Node *n;
+    struct Node *node;
     
-    n = new_node();
+    node = new_node();
     
-    n->type = CONDITIONAL;
-    n->data.con.condition = NULL;
-    n->data.con.true      = NULL;
-    n->data.con.false     = NULL;
+    node->type               = CONDITIONAL;
+    node->data.con.condition = condition;
+    node->data.con.true      = true;
+    node->data.con.false     = false;
     
-    return(n);
+    return(node);
 }
 
 void delete_node(struct Node *old)
@@ -129,17 +129,6 @@ struct Node *set_childs(struct Node *root, struct Node *left, struct Node *right
     if(root->type == OPERATOR) {
         root->data.op.left  = left;
         root->data.op.right = right;
-    }
-    
-    return(root);
-}
-
-struct Node *set_3childs(struct Node *root, struct Node *cond, struct Node *t, struct Node *f)
-{
-    if(root->type == CONDITIONAL) {
-        root->data.con.condition = cond;
-        root->data.con.true      = t;
-        root->data.con.false     = f;
     }
     
     return(root);

@@ -110,14 +110,12 @@ GRAMMAR_PARSER(T)
         return(NULL);
     
     while(CURRENT_TOKEN == '?') {
-        op = new_ternary_node();
-        
         SKIP_TOKEN;
         
         true = S(tokens);
         
         if(CURRENT_TOKEN != ':' || true == NULL) {
-            delete_node(op);
+            /* syntax error when parsing true or -> cleanup -> error */
             delete_tree(condition);
             return(NULL);
         }
@@ -127,13 +125,13 @@ GRAMMAR_PARSER(T)
         false = S(tokens);
         
         if(false == NULL) {
-            delete_node(op);
+	    /* syntax error when parsing false -> cleanup -> error */
             delete_tree(condition);
             delete_tree(true);
             return(NULL);
         }
-        
-        condition = set_3childs(op, condition, true, false);
+
+        condition = new_conditional_node(condition, true, false);
     }
     
     return(condition);
