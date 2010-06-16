@@ -99,7 +99,10 @@ int isoperator(char c)
  */
 GRAMMAR_PARSER(T)
 {
-    struct Node *condition, *true, *false, *op;
+    struct Node *condition, 
+                *true, 
+                *false, 
+                *op;
     
     condition = S(tokens);
     
@@ -144,7 +147,7 @@ GRAMMAR_PARSER(S)
 {
     struct Node *subtree, 
                 *right, 
-		*op;
+                *op;
     
     subtree = P(tokens);
     
@@ -159,7 +162,7 @@ GRAMMAR_PARSER(S)
         right = P(tokens);
         
         if(!right) {
-	    /* cleanup and return Error */
+            /* cleanup and return Error */
             delete_node(op);
             delete_tree(subtree);
             return(NULL);
@@ -260,7 +263,7 @@ GRAMMAR_PARSER(K)
 {
     struct Node *subtree, 
                 *minusone, 
-		*op;
+                *op;
     
     /* K -> -K */
     if(CURRENT_TOKEN == '-') {
@@ -274,7 +277,7 @@ GRAMMAR_PARSER(K)
         op       = new_operator_node('*');
         minusone = new_number_node(-1);
         subtree  = set_childs(op, minusone, subtree);
-	return(subtree);
+        return(subtree);
     }
 
     /* K -> (T) */
@@ -287,11 +290,11 @@ GRAMMAR_PARSER(K)
             return(NULL);
         
         if(CURRENT_TOKEN == ')') {
-	    SKIP_TOKEN;
-	    return(subtree);
-	}
-	
-	/* cleanup and return Error */
+            SKIP_TOKEN;
+            return(subtree);
+        }
+        
+        /* cleanup and return Error */
         delete_tree(subtree);
         return(NULL);
     }
@@ -299,14 +302,14 @@ GRAMMAR_PARSER(K)
     
     /* K -> Num */
     if(isdigit(CURRENT_TOKEN)) {
-	subtree = Num(tokens); 
-	return(subtree);
+        subtree = Num(tokens); 
+        return(subtree);
     }
     
     /* K -> Var */
     if(isvariable(CURRENT_TOKEN)) {
         subtree = Var(tokens);
-	return(subtree);
+        return(subtree);
     }
     
     /* Syntax Error */
