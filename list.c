@@ -17,6 +17,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h> /* fuer malloc/free */
+#include <stdio.h>  /* fuer perror/printf */
+
 #include "list.h"
 
 struct List *new_list(void)
@@ -28,10 +31,10 @@ struct List *new_list(void)
         exit(EXIT_FAILURE);
     }
     
-    n->first = NULL;
-    n->last = NULL;
+    n->first   = NULL;
+    n->last    = NULL;
     n->current = NULL;
-    n->count = 0;
+    n->count   = 0;
     
     return(n);
 }
@@ -67,10 +70,10 @@ void add_node(struct List *l, struct Node *n)
     /* leere Liste */
     if(l->first == NULL) {
         l->first = e;
-        l->last = e;
+        l->last  = e;
     } else {
         l->last->next = e;
-        l->last = e;
+        l->last       = e;
     }
     
     l->current = l->first;

@@ -19,6 +19,7 @@
 
 #include <stdio.h>  /* for printf/scanf/fopen/... */
 #include <string.h> /* for strcmp/strlen */
+#include <stdlib.h>
 #include <limits.h> /* for MAX_INPUT/LINE_MAX */
 #include <math.h>   /* for pow */
 #include <unistd.h> /* for getopt/optopt/optarg */
@@ -118,7 +119,7 @@ GRAMMAR_PARSER(T)
         if(true == NULL) {
             /* syntax error in S -> cleanup -> return error */
             delete_tree(condition);
-            return(NULL);
+            return(NULL);            
         }
         
         if(CURRENT_TOKEN != ':') {
