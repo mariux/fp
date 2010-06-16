@@ -1,5 +1,5 @@
 /*
-    formelparser - list.h
+    formelparser - node.h
 
     Copyright (C) 2010 Matthias Ruester
 
@@ -17,34 +17,30 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h> /* fuer malloc/free */
-#include <string.h> /* fuer strdup */
-#include <stdio.h>  /* fuer perror */
-
-#ifndef NODE_H
-#define NODE_H
+#ifndef FORMELPARSER_NODE_H
+#define FORMELPARSER_NODE_H
 
 /* Knoten-Typen */
-#define OPERATOR 0
-#define NUMBER 1
-#define VARIABLE 2
-#define CONDITIONAL 3 /* conditional expression operator */
+#define OPERATOR     0
+#define NUMBER       1
+#define VARIABLE     2
+#define CONDITIONAL  3
 
 /* Operatoren */
-#define ADD 4
-#define MINUS 5
-#define MULTIPLY 6
-#define DIVIDE 7
-#define POWER 8
-#define E_SYMBOL 9
+#define ADD       4
+#define MINUS     5
+#define MULTIPLY  6
+#define DIVIDE    7
+#define POWER     8
+#define E_SYMBOL  9
 
 /* Error */
 #define ERROR 10
 
 struct Operator {
+    int          operator;
     struct Node *left;
     struct Node *right;
-    int operator;
 };
 
 struct Conditional {
@@ -55,14 +51,17 @@ struct Conditional {
 
 union Data {
     long double value;
+    
     char name;
+    
     struct Conditional con;
     struct Operator op;
 };
 
 struct Node {
-    int type;
+    int   type;
     char *formula;
+    
     union Data data;
 };
 
@@ -87,4 +86,4 @@ extern void sort_tree(struct Node *root);
 extern struct List *get_operands(struct Node *root, int operator);
 extern void update(struct Node *root);
 
-#endif
+#endif /* FORMELPARSER_NODE_H */

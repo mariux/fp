@@ -17,20 +17,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
 #include "node.h"
 #include "list.h"
-#include <math.h>
 
 struct Node *new_node(void)
 {
     struct Node *n;
     
-    if((n = calloc(1, sizeof(struct Node))) == NULL) {
+    n = calloc(1, sizeof(struct Node));
+    
+    if(n == NULL) {
         perror("calloc");
         exit(EXIT_FAILURE);
     }
-    
-    n->formula = NULL;
     
     return(n);
 }
@@ -40,9 +44,6 @@ struct Node *new_operator_node(char op)
     struct Node *n;
     
     n = new_node();
-    
-    n->data.op.left = NULL;
-    n->data.op.right = NULL;
     
     n->type = OPERATOR;
     n->data.op.operator = atoo(op);
@@ -82,8 +83,8 @@ struct Node *new_ternary_node(void)
     
     n->type = CONDITIONAL;
     n->data.con.condition = NULL;
-    n->data.con.true = NULL;
-    n->data.con.false = NULL;
+    n->data.con.true      = NULL;
+    n->data.con.false     = NULL;
     
     return(n);
 }
@@ -126,7 +127,7 @@ void delete_tree(struct Node *old)
 struct Node *set_childs(struct Node *root, struct Node *left, struct Node *right)
 {
     if(root->type == OPERATOR) {
-        root->data.op.left = left;
+        root->data.op.left  = left;
         root->data.op.right = right;
     }
     
@@ -137,8 +138,8 @@ struct Node *set_3childs(struct Node *root, struct Node *cond, struct Node *t, s
 {
     if(root->type == CONDITIONAL) {
         root->data.con.condition = cond;
-        root->data.con.true = t;
-        root->data.con.false = f;
+        root->data.con.true      = t;
+        root->data.con.false     = f;
     }
     
     return(root);
@@ -206,37 +207,43 @@ void print_node(struct Node *root)
     switch(root->type) {
         case CONDITIONAL:
             printf("?");
-        break;
+            break;
         
         case OPERATOR:
             switch(root->data.op.operator) {
-                case ADD: printf("+");
-                break;
+                case ADD: 
+		    printf("+");
+                    break;
                 
-                case MINUS: printf("-");
-                break;
+                case MINUS: 
+		    printf("-");
+                    break;
                 
-                case MULTIPLY: printf("*");
-                break;
+                case MULTIPLY: 
+		    printf("*");
+                    break;
                 
-                case DIVIDE: printf("/");
-                break;
+                case DIVIDE: 
+		    printf("/");
+                    break;
                 
-                case E_SYMBOL: printf("E");
-                break;
+                case E_SYMBOL: 
+		    printf("E");
+                    break;
                 
-                case POWER: printf("^");
-                break;
+                case POWER: 
+		    printf("^");
+                    break;
             }
-        break;
+            break;
         
         case NUMBER:
             printf("%.2Lf", root->data.value);
-        break;
+            break;
         
         case VARIABLE:
             printf("%c", root->data.name);
-        break;
+            break;
     }
 }
 
@@ -255,7 +262,7 @@ void print_tree(struct Node *root)
             printf(" false: ");
             print_node(root->data.con.false);
             printf(")\n");
-        break;
+            break;
         
         case OPERATOR:
             print_tree(root->data.op.left);
@@ -269,7 +276,7 @@ void print_tree(struct Node *root)
                     printf(" right: ");
                     print_node(root->data.op.right);
                     printf(")\n");
-                break;
+                    break;
                 
                 case MINUS:
                     printf("- ");
@@ -278,7 +285,7 @@ void print_tree(struct Node *root)
                     printf(" right: ");
                     print_node(root->data.op.right);
                     printf(")\n");
-                break;
+                    break;
                 
                 case MULTIPLY:
                     printf("* ");
@@ -287,7 +294,7 @@ void print_tree(struct Node *root)
                     printf(" right: ");
                     print_node(root->data.op.right);
                     printf(")\n");
-                break;
+                    break;
                 
                 case DIVIDE:
                     printf("/ ");
@@ -296,7 +303,7 @@ void print_tree(struct Node *root)
                     printf(" right: ");
                     print_node(root->data.op.right);
                     printf(")\n");
-                break;
+                    break;
                 
                 case E_SYMBOL:
                     printf("E ");
@@ -305,7 +312,7 @@ void print_tree(struct Node *root)
                     printf(" right: ");
                     print_node(root->data.op.right);
                     printf(")\n");
-                break;
+                    break;
                 
                 case POWER:
                     printf("^ ");
@@ -314,21 +321,21 @@ void print_tree(struct Node *root)
                     printf(" right: ");
                     print_node(root->data.op.right);
                     printf(")\n");
-                break;
+                    break;
             }
-        break;
+            break;
         
         case NUMBER:
             /* printf("%d\n", root->data.value); */
-        break;
+            break;
         
         case VARIABLE:
             /* printf("%c\n", root->data.name); */
-        break;
+            break;
         
         default:
             printf("ERROR\n");
-        break;
+            break;
     }
 }
 
@@ -343,20 +350,23 @@ char *ldtostr(long double d)
     char *ret;
     long double h;
     
-    if(d == HUGE_VAL
-    || d == -HUGE_VAL)
+    if(d == HUGE_VAL || d == -HUGE_VAL) {
         return(strdup("inf"));
+    }
     
-    if(d == 0.0)
+    if(d == 0.0) {
         digits = 1;
-    else
+    } else {
         digits = 0;
+    }
     
-    if(d < 0)
+    if(d < 0) {
         digits++;
+    }
     
-    for(h = d; my_fabs(h) > 0.0; h /= 10.0)
+    for(h = d; my_fabs(h) > 0.0; h /= 10.0) {
         digits++;
+    }
     
     /* digit-characters '.' precision-characters '\0' */
     if((ret = calloc(digits + 1 + 65 + 1, sizeof(char))) == NULL) {
@@ -376,8 +386,9 @@ char *get_formula(struct Node *root)
     char temp[2];
     char *h;
     
-    if(root == NULL)
+    if(root == NULL) {
         return(NULL);
+    }
     
     if(f == 0 && (formula = calloc(1, sizeof(char))) == NULL) {
         perror("calloc");
@@ -418,7 +429,7 @@ char *get_formula(struct Node *root)
             }
             
             strcat(formula, ")");
-        break;
+            break;
         
         case OPERATOR:
             if(root->data.op.left->type == OPERATOR && root->data.op.left->data.op.operator != root->data.op.operator) {
@@ -470,7 +481,7 @@ char *get_formula(struct Node *root)
 
                 strcat(formula, ")");
             }
-        break;
+            break;
         
         case NUMBER:
             h = ldtostr(root->data.value);
@@ -483,7 +494,7 @@ char *get_formula(struct Node *root)
             strcat(formula, h);
             
             free(h);
-        break;
+            break;
         
         case VARIABLE:
             if((formula = realloc(formula, (strlen(formula) + 2) * sizeof(char))) == NULL) {
@@ -494,7 +505,7 @@ char *get_formula(struct Node *root)
             sprintf(temp, "%c", root->data.name);
             temp[1] = '\0';
             strcat(formula, temp);
-        break;
+            break;
         
         case E_SYMBOL:
             if((formula = realloc(formula, (strlen(formula) + 2) * sizeof(char))) == NULL) {
@@ -505,17 +516,18 @@ char *get_formula(struct Node *root)
             sprintf(temp, "E");
             temp[1] = '\0';
             strcat(formula, temp);
-        break;
+            break;
         
         default:
             printf("ERROR\n");
-        break;
+            break;
     }
     
     f--;
     
-    if(f == 0)
+    if(f == 0) {
         return(formula);
+    }
     
     return(NULL);
 }
@@ -525,14 +537,16 @@ int cmp_nodes(struct Node *n1, struct Node *n2)
     if(n1->type == n2->type) {
         switch(n1->type) {
             case NUMBER:
-                if(n1->data.value == n2->data.value)
+                if(n1->data.value == n2->data.value) {
                     return(1);
-            break;
+		}
+                break;
             
             case VARIABLE:
-                if(n1->data.name == n2->data.name)
+                if(n1->data.name == n2->data.name) {
                     return(1);
-            break;
+		}
+                break;
         }
     }
         
@@ -543,19 +557,20 @@ struct Node *get_parent(struct Node *root, struct Node *search)
 {
     struct Node *parent;
     
-    if(root == NULL)
+    if(root == NULL) {
         return(NULL);
+    }
     
     switch(root->type) {
         case OPERATOR:
             if((parent = get_parent(root->data.op.left, search)) != NULL
-            || (parent = get_parent(root->data.op.right, search)) != NULL)
+               || (parent = get_parent(root->data.op.right, search)) != NULL)
                 return(parent);
             
             if(root->data.op.left == search
-            || root->data.op.right == search)
+               || root->data.op.right == search)
                 return(root);
-        break;
+            break;
         
         case NUMBER:
 
@@ -564,19 +579,20 @@ struct Node *get_parent(struct Node *root, struct Node *search)
                 printf("match\n");
 #endif
 
-        break;
+            break;
         
         case CONDITIONAL:
             if((parent = get_parent(root->data.con.condition, search)) != NULL
-            || (parent = get_parent(root->data.con.true, search)) != NULL
-            || (parent = get_parent(root->data.con.false, search)) != NULL)
+               || (parent = get_parent(root->data.con.true, search)) != NULL
+               || (parent = get_parent(root->data.con.false, search)) != NULL) {
                 return(parent);
-            
+            }
             if(root->data.con.condition == search
-            || root->data.con.true == search
-            || root->data.con.false == search)
+              || root->data.con.true == search
+              || root->data.con.false == search) {
                 return(root);
-        break;
+	    }
+            break;
     }
     
     return(NULL);
@@ -681,8 +697,9 @@ void sort_conditional(struct List *l)
 
 void sort(struct Node *root, struct List *l, int operator)
 {
-    if(root == NULL)
+    if(root == NULL) {
         return;
+    }
     
     if(root->type == OPERATOR && root->data.op.operator == operator) {
         if(root->data.op.left->type == OPERATOR && root->data.op.left->data.op.operator == operator
@@ -745,7 +762,7 @@ void sort_tree(struct Node *root)
             sort_tree(root->data.con.condition);
             sort_tree(root->data.con.true);
             sort_tree(root->data.con.false);
-        break;
+            break;
         
         case OPERATOR:
             sort_tree(root->data.op.left);
@@ -821,7 +838,7 @@ void sort_tree(struct Node *root)
             delete_list_without_nodes(operands);
             delete_list_without_nodes(conditional);
             delete_list_without_nodes(sorted);
-        break;
+            break;
     }
 }
 
@@ -840,7 +857,7 @@ void update(struct Node *root)
                 free(root->formula);
             
             root->formula = get_formula(root);
-        break;
+            break;
         
         case OPERATOR:
             update(root->data.op.left);
@@ -850,7 +867,7 @@ void update(struct Node *root)
                 free(root->formula);
             
             root->formula = get_formula(root);
-        break;
+            break;
     }
 }
 
@@ -872,7 +889,7 @@ void print_formula(struct Node *root, int precision)
             printf("):(");
             print_formula(root->data.con.false, precision);
             printf(")");
-        break;
+            break;
         
         case OPERATOR:
             if(root->data.op.left->type == OPERATOR && root->data.op.left->data.op.operator != root->data.op.operator)
@@ -892,19 +909,19 @@ void print_formula(struct Node *root, int precision)
             
             if(root->data.op.right->type == OPERATOR && root->data.op.right->data.op.operator != root->data.op.operator)
                 printf(")");
-        break;
+            break;
         
         case NUMBER:
             printf("%.*Lf", precision, root->data.value);
-        break;
+            break;
         
         case VARIABLE:
             printf("%c", root->data.name);
-        break;
+            break;
         
         default:
             printf("ERROR\n");
-        break;
+            break;
     }
     
     f--;
