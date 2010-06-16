@@ -101,8 +101,7 @@ GRAMMAR_PARSER(T)
 {
     struct Node *condition, 
                 *true, 
-                *false, 
-                *op;
+                *false;
     
     condition = S(tokens);
     
