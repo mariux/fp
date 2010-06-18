@@ -2,6 +2,7 @@
     formelparser - formelparser.c
 
     Copyright (C) 2010 Matthias Ruester
+    Copyright (C) 2010 Max Planck Institut for Molecular Genetics
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,34 +18,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>  /* for printf/scanf/fopen/... */
-#include <string.h> /* for strcmp/strlen */
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
-#include <limits.h> /* for MAX_INPUT/LINE_MAX */
-#include <math.h>   /* for pow */
-#include <unistd.h> /* for getopt/optopt/optarg */
-#include <ctype.h>  /* isdigit() */
-
+#include <limits.h>
+#include <math.h>
+#include <unistd.h>
+#include <ctype.h>
 
 /* #define DEBUG */
-
-/*
- * own includes
- */
 
 #include "node.h"
 #include "list.h"
 #include "grammar.h"
-/*
- * functions
- */
-int isoperator(char c);
-int isbracket(char c);
-
-long double calculate_parse_tree(struct Node *root);
-int count_numerics(int number);
-void reduce(struct Node *root);
-void print_usage();
 
 /*
  * function checks if a character is a operator
@@ -56,7 +42,6 @@ int isoperator(char c)
 {
     return(atoo(c) != ERROR);
 }
-
 
 /*
  * function counts the numerics of a number
@@ -244,55 +229,6 @@ void replace(char b, struct Node **root, struct Node *n)
             if((*root)->data.name == b)
                 *root = memcpy(*root, n, sizeof(struct Node));
         break;
-    }
-}
-
-/* 
- * function replaces all variables in a tree by asking the user for values
- * 1. argument: adress of the pointer of the tree
- * return value: none
- */
-void replace_variables(struct Node **root)
-{
-    char *variables, *i;
-    char input[MAX_INPUT];
-    struct Node *value;
-    
-    while(has_variables(*root)) {
-        /* create emtpy string */
-        if((variables = calloc(1, sizeof(char))) == NULL) {
-            perror("calloc");
-            exit(EXIT_FAILURE);
-        }
-        
-        /* find all variables in tree */
-        find_variables(*root, &variables);
-
-#ifdef DEBUG
-        print_tree(*root);
-#endif
-
-        for(i = variables; *i != '\0'; i++) {
-            /* ask for value of variable */
-            printf("value of variable %c: ", *i);
-            scanf("%s", input);
-            
-            /* create parse tree */
-            value = parse(input);
-            
-            if(value == NULL)
-                i--;
-            
-            reduce(value);
-            
-            /* replace variable in tree */
-            replace(*i, root, value);
-            
-            delete_node(value);
-        }
-        
-        /* free memory of string */
-        free(variables);
     }
 }
 
@@ -723,6 +659,55 @@ void reduce(struct Node *root)
     }
 }
 
+/* 
+ * function replaces all variables in a tree by asking the user for values
+ * 1. argument: adress of the pointer of the tree
+ * return value: none
+ */
+void replace_variables(struct Node **root)
+{
+    char *variables, *i;
+    char input[MAX_INPUT];
+    struct Node *value;
+    
+    while(has_variables(*root)) {
+        /* create emtpy string */
+        if((variables = calloc(1, sizeof(char))) == NULL) {
+            perror("calloc");
+            exit(EXIT_FAILURE);
+        }
+        
+        /* find all variables in tree */
+        find_variables(*root, &variables);
+
+#ifdef DEBUG
+        print_tree(*root);
+#endif
+
+        for(i = variables; *i != '\0'; i++) {
+            /* ask for value of variable */
+            printf("value of variable %c: ", *i);
+            scanf("%s", input);
+            
+            /* create parse tree */
+            value = parse(input);
+            
+            if(value == NULL)
+                i--;
+            
+            reduce(value);
+            
+            /* replace variable in tree */
+            replace(*i, root, value);
+            
+            delete_node(value);
+        }
+        
+        /* free memory of string */
+        free(variables);
+    }
+}
+
 void print_usage()
 {
     printf("usage: formelparser [FORMULA]...\n");
@@ -825,24 +810,24 @@ int main(int argc, char *argv[])
             continue;
         } else {
             /*
-            printf("vor Sortierung:\n");
+            printf("before sorting:\n");
             print_formula(parse_tree, 2);
             
             sort_tree(parse_tree);
             
-            printf("nach Sortierung:\n");
+            printf("after sorting:\n");
             print_formula(parse_tree, 2);
             */
             
             /*
-            printf("vorher: ");
+            printf("before reducing: ");
             print_formula(parse_tree, precision);
             */
             
             reduce(parse_tree);
             
             /*
-            printf("nachher: ");
+            printf("after reducing: ");
             print_formula(parse_tree, precision);
             */
             
@@ -868,8 +853,6 @@ int main(int argc, char *argv[])
         }
         
         i++;
-        
-        /* free memory of tokens */
     } while(fromfile ? (fscanf(file, "%s\n", read) != EOF) : (argv[i] != NULL));
     
     /* close file */

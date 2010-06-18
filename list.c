@@ -18,8 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h> /* for malloc/free */
-#include <stdio.h>  /* for perror/printf */
+#include <stdlib.h>
+#include <stdio.h>
 
 #include "list.h"
 

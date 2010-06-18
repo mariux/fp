@@ -20,8 +20,8 @@
 
 #include "node.h"
 
-#ifndef LIST_H
-#define LIST_H
+#ifndef FORMELPARSER_LIST_H
+#define FORMELPARSER_LIST_H
 
 struct List {
     struct Element *first;
@@ -36,12 +36,12 @@ struct Element {
 };
 
 extern struct List *new_list(void);
-extern struct Element *new_element(struct Node *n);
-extern void add_node(struct List *l, struct Node *n);
-extern void delete_list(struct List *old);
-extern void print_list(struct List *l);
-extern void delete_list_without_nodes(struct List *old);
-extern void rewind_list(struct List *l);
-extern void next_element(struct List *l);
+extern struct Element *new_element(struct Node *);
+extern void add_node(struct List *, struct Node *);
+extern void delete_list(struct List *);
+extern void print_list(struct List *);
+extern void delete_list_without_nodes(struct List *);
+extern void rewind_list(struct List *);
+extern void next_element(struct List *);
 
-#endif
+#endif /* FORMELPARSER_LIST_H*/

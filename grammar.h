@@ -2,6 +2,7 @@
     formelparser - grammar.h
 
     Copyright (C) 2010 Matthias Ruester
+    Copyright (C) 2010 Max Planck Institut for Molecular Genetics
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,7 +20,6 @@
 
 #include "tokenizer.h"
 
-#define GRAMMAR_PARSER(X)     struct Node *X(struct Tokenizer *tokenizer)
+#define GRAMMAR_PARSER(X) struct Node *X(struct Tokenizer *tokenizer)
 
-extern struct Node *parse(char *string);
-
+extern struct Node *parse(char *);

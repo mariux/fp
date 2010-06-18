@@ -2,6 +2,7 @@
     formelparser - grammar.c
 
     Copyright (C) 2010 Matthias Ruester
+    Copyright (C) 2010 Max Planck Institut for Molecular Genetics
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,10 +22,8 @@
 #include <math.h>
 #include <ctype.h>
 
-
 #include "node.h"
 #include "grammar.h"
-
 
 /* Prototype of static functions */
 
@@ -38,7 +37,6 @@ static GRAMMAR_PARSER(N);
 static GRAMMAR_PARSER(Z);
 static GRAMMAR_PARSER(Var);
 static GRAMMAR_PARSER(B);
-
 
 struct Node *parse(char *string)
 {
@@ -57,11 +55,11 @@ struct Node *parse(char *string)
     free_tokenizer(tokenizer);
 
     if(!root) {
-        if(c == '\0') {
+        if(c == '\0')
             printf("unexpected end of string\n");
-        } else {
+        else
             printf("syntax error at position %d near '%c'\n", position, c);
-        }
+        
         return(NULL);
     }
     
@@ -80,7 +78,7 @@ struct Node *parse(char *string)
  * S   -> P | P + P | P - P
  * P   -> O | O * O | O / O | OVar
  * O   -> K | K ^ K
- * K   -> (T) | -(T) | Num | -Num | Var | -Var
+ * K   -> -K | (T) | Num | Var
  * Num -> N | N 'E' Z | N 'E' - Z
  * N   -> Z | Z . Z
  * Z   -> [0-9]+
@@ -100,17 +98,16 @@ GRAMMAR_PARSER(T)
     
     condition = S(tokenizer);
     
-    if(condition == NULL) {
+    if(!condition)
         /* syntax error in S -> return error */
         return(NULL);
-    }
     
     while(CURRENT_TOKEN == '?') {
         SKIP_TOKEN;
         
         true = S(tokenizer);
         
-        if(true == NULL) {
+        if(!true) {
             /* syntax error in S -> cleanup -> return error */
             delete_tree(condition);
             return(NULL);            
@@ -127,7 +124,7 @@ GRAMMAR_PARSER(T)
         
         false = S(tokenizer);
         
-        if(false == NULL) {
+        if(!false) {
             /* syntax error in S -> cleanup -> return error */
             delete_tree(condition);
             delete_tree(true);
@@ -181,24 +178,23 @@ static GRAMMAR_PARSER(S)
  */
 static GRAMMAR_PARSER(P)
 {
-    struct Node *subtree, *subtree2, *op;
+    struct Node *subtree, *right, *op;
     
     subtree = O(tokenizer);
     
-    if(subtree == NULL)
+    if(!subtree)
         return(NULL);
     
     while(islower(CURRENT_TOKEN)) {
-        subtree2 = Var(tokenizer);
+        right = Var(tokenizer);
         
-        if(subtree2 == NULL) {
+        if(!right) {
             delete_node(subtree);
             return(NULL);
         }
         
-        op = new_operator_node('*');
-        
-        subtree = set_childs(op, subtree, subtree2);
+        subtree = set_childs(new_operator_node('*'),
+                             subtree, right);
     }
     
     while(CURRENT_TOKEN == '*' || CURRENT_TOKEN == '/') {
@@ -206,15 +202,15 @@ static GRAMMAR_PARSER(P)
         
         SKIP_TOKEN;
         
-        subtree2 = O(tokenizer);
+        right = O(tokenizer);
         
-        if(subtree2 == NULL) {
+        if(!right) {
             delete_node(op);
             delete_tree(subtree);
             return(NULL);
         }
         
-        subtree = set_childs(op, subtree, subtree2);
+        subtree = set_childs(op, subtree, right);
     }
     
     return(subtree);
@@ -226,45 +222,36 @@ static GRAMMAR_PARSER(P)
  */
 static GRAMMAR_PARSER(O)
 {
-    struct Node *subtree, *subtree2, *op;
+    struct Node *subtree, *right;
     
     subtree = K(tokenizer);
     
-    if(subtree == NULL)
+    if(!subtree)
         return(NULL);
     
     while(CURRENT_TOKEN == '^') {
-        op = new_operator_node('^');
-        
         SKIP_TOKEN;
         
-        subtree2 = K(tokenizer);
+        right = K(tokenizer);
         
-        if(subtree2 == NULL) {
-            delete_tree(op);
+        if(!right) {
             delete_tree(subtree);
             return(NULL);
         }
         
-        subtree = set_childs(op, subtree, subtree2);
+        subtree = set_childs(new_operator_node('^'), subtree, right);
     }
     
     return(subtree);
 }
 
 /*
- * function for braces and signed numbers or variables
- * K -> (T) | -(T) | Num | -Num | Var | -Var
- *
- * that sounds wrong since the function does something like:
- *
+ * function for signed terms, braces, numbers and variables
  * K -> -K | (T) | Num | Var
  */
 static GRAMMAR_PARSER(K)
 {
-    struct Node *subtree, 
-                *minusone, 
-                *op;
+    struct Node *subtree;
     
     /* K -> -K */
     if(CURRENT_TOKEN == '-') {
@@ -275,9 +262,9 @@ static GRAMMAR_PARSER(K)
         if(!subtree)
             return(NULL);
 
-        op       = new_operator_node('*');
-        minusone = new_number_node(-1);
-        subtree  = set_childs(op, minusone, subtree);
+        subtree  = set_childs(new_operator_node('*'),
+                              new_number_node(-1),
+                              subtree);
         return(subtree);
     }
 
@@ -318,16 +305,16 @@ static GRAMMAR_PARSER(K)
 }
 
 /*
- * function for numbers (maybe with an "E")
+ * function for numbers (maybe with an 'E')
  * Num -> N | N 'E' Z | N 'E' '-' Z
  */
 static GRAMMAR_PARSER(Num)
 {
-    struct Node *subtree, *subtree2;
+    struct Node *subtree, *right;
     
     subtree = N(tokenizer); /* get number */
     
-    if(subtree == NULL)
+    if(!subtree)
         return(NULL);
     
     if(CURRENT_TOKEN == 'E') {
@@ -338,28 +325,28 @@ static GRAMMAR_PARSER(Num)
             /* skip subtraction sign */
             SKIP_TOKEN;            
 
-            subtree2 = Z(tokenizer); /* get number */
+            right = Z(tokenizer); /* get number */
             
-            if(subtree2 == NULL) {
+            if(!right) {
                 delete_tree(subtree);
                 return(NULL);
             }
             
-            subtree2 = set_childs(new_operator_node('*'),
-                                  new_number_node(-1), subtree2);
+            right = set_childs(new_operator_node('*'),
+                               new_number_node(-1), right);
             
             subtree = set_childs(new_operator_node('E'),
-                                 subtree, subtree2);
+                                 subtree, right);
         } else {
-            subtree2 = Z(tokenizer); /* get number */
+            right = Z(tokenizer); /* get number */
             
-            if(subtree2 == NULL) {
+            if(!right) {
                 delete_tree(subtree);
                 return(NULL);
             }
             
             subtree = set_childs(new_operator_node('E'),
-                                 subtree, subtree2);
+                                 subtree, right);
         }
     }
     
@@ -378,7 +365,7 @@ static GRAMMAR_PARSER(N)
     
     subtree = Z(tokenizer);
     
-    if(subtree == NULL)
+    if(!subtree)
         return(NULL);
     
     if(CURRENT_TOKEN == '.' || CURRENT_TOKEN == ',') {
@@ -409,23 +396,19 @@ static GRAMMAR_PARSER(N)
 static GRAMMAR_PARSER(Z)
 {
     struct Node *subtree;
-    int digits;
     long double number;
     
     subtree = NULL;
-    digits = 0;
     number = 0.0;
     
-    while(isdigit(CURRENT_TOKEN)) {
-        digits = 1;
-        
+    if(!isdigit(CURRENT_TOKEN))
+        return(NULL);
+    
+    while(isdigit(CURRENT_TOKEN)) {    
         number = number * 10.0 + (CURRENT_TOKEN - '0');
         
         SKIP_TOKEN;
     }
-    
-    if(!digits)
-        return(NULL);
     
     subtree = new_number_node(number);
     
@@ -438,24 +421,23 @@ static GRAMMAR_PARSER(Z)
  */
 static GRAMMAR_PARSER(Var)
 {
-    struct Node *subtree, *subtree2, *op;
+    struct Node *subtree, *right;
     
     subtree = B(tokenizer);
         
-    if(subtree == NULL)
+    if(!subtree)
         return(NULL);
     
     if(isdigit(CURRENT_TOKEN)) {
-        subtree2 = Z(tokenizer);
+        right = Z(tokenizer);
         
-        if(subtree2 == NULL) {
+        if(!right) {
             delete_tree(subtree);
             return(NULL);
         }
         
-        op = new_operator_node('^');
-        
-        subtree = set_childs(op, subtree, subtree2);
+        subtree = set_childs(new_operator_node('^'),
+                             subtree, right);
     }
     
     return(subtree);

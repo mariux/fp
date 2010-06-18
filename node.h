@@ -66,24 +66,24 @@ struct Node {
     union Data data;
 };
 
-extern struct Node *new_operator_node(char op);
-extern struct Node *new_variable_node(char var);
-extern struct Node *new_number_node(double nr);
+extern struct Node *new_operator_node(char);
+extern struct Node *new_variable_node(char);
+extern struct Node *new_number_node(double);
 extern struct Node *new_conditional_node(struct Node *, struct Node *, struct Node *);
 extern struct Node *new_node(void);
-extern void delete_node(struct Node *old);
-extern void delete_tree(struct Node *old);
-extern struct Node *set_childs(struct Node *root, struct Node *left, struct Node *right);
-extern char otoa(int operator);
-extern int atoo(char op);
-extern int cmp_nodes(struct Node *n1, struct Node *n2);
-extern void print_node(struct Node *root);
-extern char *get_formula(struct Node *root);
-extern int cmp_trees(struct Node *a, struct Node *b);
-extern struct Node *get_parent(struct Node *root, struct Node *search);
-extern void print_formula(struct Node *root, int precision);
-extern void sort_tree(struct Node *root);
-extern struct List *get_operands(struct Node *root, int operator);
-extern void update(struct Node *root);
+extern void delete_node(struct Node *);
+extern void delete_tree(struct Node *);
+extern struct Node *set_childs(struct Node *, struct Node *, struct Node *);
+extern char otoa(int);
+extern int atoo(char);
+extern int cmp_nodes(struct Node *, struct Node *);
+extern void print_node(struct Node *);
+extern char *get_formula(struct Node *);
+extern int cmp_trees(struct Node *, struct Node *);
+extern struct Node *get_parent(struct Node *, struct Node *);
+extern void print_formula(struct Node *, int);
+extern void sort_tree(struct Node *);
+extern struct List *get_operands(struct Node *, int);
+extern void update(struct Node *);
 
 #endif /* FORMELPARSER_NODE_H */

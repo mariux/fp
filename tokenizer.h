@@ -2,6 +2,7 @@
     formelparser - tokenizer.h
 
     Copyright (C) 2010 Matthias Ruester
+    Copyright (C) 2010 Max Planck Institut for Molecular Genetics
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,8 +21,8 @@
 #ifndef FORMELPARSER_TOKENIZER_H
 #define FORMELPARSER_TOKENIZER_H
 
-#define CURRENT_TOKEN         (*(tokenizer->current_token))
-#define SKIP_TOKEN            next_token(tokenizer)
+#define CURRENT_TOKEN (*(tokenizer->current_token))
+#define SKIP_TOKEN    next_token(tokenizer)
 
 struct Tokenizer {
     char *current_token;
@@ -30,8 +31,7 @@ struct Tokenizer {
 };
 
 extern struct Tokenizer *create_tokenizer(char *);
-
 extern void next_token(struct Tokenizer *);
 extern void free_tokenizer(struct Tokenizer *);
 
-#endif
+#endif /* FORMELPARSER_TOKENIZER_H */
