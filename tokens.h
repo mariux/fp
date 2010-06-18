@@ -1,7 +1,8 @@
 /*
-    formelparser - string.h
+    formelparser - tokens.h
 
     Copyright (C) 2010 Matthias Ruester
+    Copyright (C) 2010 Max Planck Institut for Molecular Genetics
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,23 +18,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef STRING_H
-#define STRING_H
+#ifndef TOKENS_H
+#define TOKENS_H
 
-#define CURRENT_TOKEN (*(tokens->current))
-#define SKIP_TOKEN    next_char(tokens)
-
-#define GRAMMAR_PARSER(X)     struct Node *X(struct String *tokens)
-
-struct String {
+struct Tokens {
     char *current;
     char *str;
     int i;
 };
 
-extern struct String *new_string(char s[]);
-extern void next_char(struct String *t);
-extern void rewind_string(struct String *t);
-extern void delete_string(struct String *s);
+extern struct Tokens *new_string(char s[]);
+extern void next_char(struct Tokens *t);
+extern void rewind_string(struct Tokens *t);
+extern void delete_string(struct Tokens *s);
 
 #endif

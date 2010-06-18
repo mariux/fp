@@ -1,7 +1,7 @@
 CC	=/usr/bin/gcc
 CFLAGS	=-Wall -g -pedantic
 LDFLAGS =-lm
-OBJECTS =node.o string.o list.o
+OBJECTS =node.o tokens.o list.o
 
 all: formelparser
 

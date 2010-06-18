@@ -2,6 +2,7 @@
     formelparser - list.c
 
     Copyright (C) 2010 Matthias Ruester
+    Copyright (C) 2010 Max Planck Institut for Molecular Genetics
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,8 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h> /* fuer malloc/free */
-#include <stdio.h>  /* fuer perror/printf */
+#include <stdlib.h> /* for malloc/free */
+#include <stdio.h>  /* for perror/printf */
 
 #include "list.h"
 

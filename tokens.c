@@ -2,6 +2,7 @@
     formelparser - string.c
 
     Copyright (C) 2010 Matthias Ruester
+    Copyright (C) 2010 Max Planck Institut for Molecular Genetics
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,9 +22,9 @@
 #include <stdio.h>  /* for perror/printf */
 #include <string.h> /* for strlen */
 
-#include "string.h"
+#include "tokens.h"
 
-void next_char(struct String *t)
+void next_char(struct Tokens *t)
 {
     if(t->current == NULL)
         return;
@@ -39,14 +40,14 @@ void next_char(struct String *t)
     t->i++;
 }
 
-struct String *new_string(char *s)
+struct Tokens *new_string(char *s)
 {
-    struct String *n;
+    struct Tokens *n;
     
     if(s == NULL)
         return(NULL);
     
-    if((n = malloc(sizeof(struct String))) == NULL) {
+    if((n = malloc(sizeof(struct Tokens))) == NULL) {
         perror("malloc");
         exit(EXIT_FAILURE);
     }
@@ -63,13 +64,13 @@ struct String *new_string(char *s)
     return(n);
 }
 
-void rewind_string(struct String *t)
+void rewind_string(struct Tokens *t)
 {
     t->current = t->str;
     t->i = 1;
 }
 
-void delete_string(struct String *s)
+void delete_string(struct Tokens *s)
 {
     free(s->str);
     free(s);

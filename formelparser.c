@@ -2,6 +2,7 @@
     formelparser - formelparser.c
 
     Copyright (C) 2010 Matthias Ruester
+    Copyright (C) 2010 Max Planck Institut for Molecular Genetics
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/* includes */
 #include <stdio.h>  /* for printf/scanf/fopen/... */
 #include <string.h> /* for strcmp/strlen */
 #include <stdlib.h> /* for exit */
@@ -25,19 +27,18 @@
 #include <unistd.h> /* for getopt/optopt/optarg */
 #include <ctype.h>  /* isdigit() */
 
-/* #define DEBUG */
-
-/*
- * own includes
- */
-
+/* own header files */
 #include "node.h"
-#include "string.h"
+#include "tokens.h"
 #include "list.h"
 
-/*
- * functions
- */
+/* macros */
+#define CURRENT_TOKEN (*(tokens->current))
+#define SKIP_TOKEN  next_char(tokens)
+#define GRAMMAR_PARSER(X) struct Node *X(struct Tokens *tokens)
+/* #define DEBUG */
+
+/* functions */
 int isvariable(char c);
 int isoperator(char c);
 GRAMMAR_PARSER(T);
@@ -50,7 +51,7 @@ GRAMMAR_PARSER(N);
 GRAMMAR_PARSER(Z);
 GRAMMAR_PARSER(Var);
 GRAMMAR_PARSER(B);
-struct Node *create_parse_tree(struct String *tokens);
+struct Node *create_parse_tree(struct Tokens *tokens);
 long double calculate_parse_tree(struct Node *root);
 void reduce(struct Node *root);
 void print_usage();
@@ -501,7 +502,7 @@ GRAMMAR_PARSER(B)
  * 1. argument: tokens of a string
  * return value: the parse tree
  */
-struct Node *create_parse_tree(struct String *tokens)
+struct Node *create_parse_tree(struct Tokens *tokens)
 {
     struct Node *parse_tree;
     
@@ -709,7 +710,7 @@ void replace_variables(struct Node **root)
 {
     char *variables, *i;
     char input[MAX_INPUT];
-    struct String *string;
+    struct Tokens *tokens;
     struct Node *value;
     
     while(has_variables(*root)) {
@@ -732,10 +733,10 @@ void replace_variables(struct Node **root)
             scanf("%s", input);
             
             /* create tokens of input */
-            string = new_string(input);
+            tokens = new_string(input);
             
             /* create parse tree */
-            value = create_parse_tree(string);
+            value = create_parse_tree(tokens);
             
             if(value == NULL)
                 i--;
@@ -748,7 +749,7 @@ void replace_variables(struct Node **root)
             delete_node(value);
             
             /* free memory of tokens */
-            delete_string(string);
+            delete_string(tokens);
         }
         
         /* free memory of string */
@@ -1191,7 +1192,7 @@ void print_usage()
 
 int main(int argc, char *argv[])
 {
-    struct String *string;
+    struct Tokens *tokens;
     struct Node *parse_tree;
     long double result;
     int i, fromfile;
@@ -1280,36 +1281,36 @@ int main(int argc, char *argv[])
         }
         
         /* create tokens */
-        if((string = new_string(term)) == NULL)
+        if((tokens = new_string(term)) == NULL)
             printf("cannot create tokens for %s\n", term);
         
         /* create parse tree */
-        if((parse_tree = create_parse_tree(string)) == NULL) {
+        if((parse_tree = create_parse_tree(tokens)) == NULL) {
             printf("cannot create parse tree for %s\n", term);
             i++;
-            free(string->str);
-            free(string);
+            free(tokens->str);
+            free(tokens);
             continue;
         } else {
             /*
-            printf("vor Sortierung:\n");
+            printf("before sorting:\n");
             print_formula(parse_tree, 2);
             
             sort_tree(parse_tree);
             
-            printf("nach Sortierung:\n");
+            printf("after sorting:\n");
             print_formula(parse_tree, 2);
             */
             
             /*
-            printf("vorher: ");
+            printf("before reducing: ");
             print_formula(parse_tree, precision);
             */
             
             reduce(parse_tree);
             
             /*
-            printf("nachher: ");
+            printf("after reducing: ");
             print_formula(parse_tree, precision);
             */
             
@@ -1337,8 +1338,8 @@ int main(int argc, char *argv[])
         i++;
         
         /* free memory of tokens */
-        free(string->str);
-        free(string);
+        free(tokens->str);
+        free(tokens);
     } while(fromfile ? (fscanf(file, "%s\n", read) != EOF) : (argv[i] != NULL));
     
     /* close file */
