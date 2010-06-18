@@ -1,14 +1,14 @@
 CC	=/usr/bin/gcc
 CFLAGS	=-Wall -g -pedantic
 LDFLAGS =-lm
-OBJECTS =node.o tokenizer.o list.o grammar.o
+OBJECTS =node.o tokenizer.o list.o grammar.o formelparser.o
 
 all: formelparser
 
-formelparser: formelparser.o $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+formelparser: $(OBJECTS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
-%.o: %.c %.h
+%.o: %.c
 	$(CC) -c $(CFLAGS) $<
 
 touch:

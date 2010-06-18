@@ -1,7 +1,7 @@
 /*
     formelparser - formelparser.c
 
-    Copyright (C) 2010 Matthias Ruester
+    Copyright (C) 2010 Matthias Ruester <ruester@molgen.mpg.de>
     Copyright (C) 2010 Max Planck Institut for Molecular Genetics
 
     This program is free software: you can redistribute it and/or modify

@@ -1,7 +1,7 @@
 /*
     formelparser - list.c
 
-    Copyright (C) 2010 Matthias Ruester
+    Copyright (C) 2010 Matthias Ruester <ruester@molgen.mpg.de>
     Copyright (C) 2010 Max Planck Institut for Molecular Genetics
 
     This program is free software: you can redistribute it and/or modify
@@ -68,7 +68,7 @@ void add_node(struct List *l, struct Node *n)
     
     e = new_element(n);
     
-    /* leere Liste */
+    /* empty list */
     if(l->first == NULL) {
         l->first = e;
         l->last  = e;
@@ -121,7 +121,7 @@ void delete_list(struct List *old)
 void print_list(struct List *l)
 {
     if(l == NULL)
-        printf("Die Liste ist NULL\n");
+        printf("list is NULL\n");
     
     l->current = l->first;
     
@@ -133,12 +133,12 @@ void print_list(struct List *l)
     }
     
     if(l->count == 0)
-        printf("Die Liste ist leer\n");
+        printf("the list is empty\n");
     else {
         if(l->count == 1)
-            printf("Die Liste hat ein Element\n");
+            printf("the list has one element\n");
         else
-            printf("Die Liste hat %d Elemente\n", l->count);
+            printf("the list has %d elements\n", l->count);
     }
     
     rewind_list(l);

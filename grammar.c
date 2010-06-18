@@ -1,7 +1,7 @@
 /*
     formelparser - grammar.c
 
-    Copyright (C) 2010 Matthias Ruester
+    Copyright (C) 2010 Matthias Ruester <ruester@molgen.mpg.de>
     Copyright (C) 2010 Max Planck Institut for Molecular Genetics
 
     This program is free software: you can redistribute it and/or modify
@@ -325,7 +325,8 @@ static GRAMMAR_PARSER(Num)
             /* skip subtraction sign */
             SKIP_TOKEN;            
 
-            right = Z(tokenizer); /* get number */
+            /* get number */
+            right = Z(tokenizer);
             
             if(!right) {
                 delete_tree(subtree);
@@ -338,7 +339,8 @@ static GRAMMAR_PARSER(Num)
             subtree = set_childs(new_operator_node('E'),
                                  subtree, right);
         } else {
-            right = Z(tokenizer); /* get number */
+            /* get number */
+            right = Z(tokenizer);
             
             if(!right) {
                 delete_tree(subtree);
