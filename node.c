@@ -33,7 +33,7 @@ struct Node *new_node(void)
     n = calloc(1, sizeof(struct Node));
     
     if(n == NULL) {
-        perror("calloc");
+        perror("calloc(node)");
         exit(EXIT_FAILURE);
     }
     
@@ -316,11 +316,11 @@ void print_tree(struct Node *root)
             break;
         
         case NUMBER:
-            /* printf("%d\n", root->data.value); */
+            printf("%Lf\n", root->data.value);
             break;
         
         case VARIABLE:
-            /* printf("%c\n", root->data.name); */
+            printf("%c\n", root->data.name);
             break;
         
         default:
@@ -331,7 +331,7 @@ void print_tree(struct Node *root)
 
 long double my_fabs(long double d)
 {
-    return(d < 0 ? -d : d);    
+    return((d < 0) ? (-d) : (d));    
 }
 
 char *ldtostr(long double d)

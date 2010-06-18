@@ -27,7 +27,7 @@
 struct Tokenizer {
     char *current_token;
     char *string;
-    int  position;
+    int   position;
 };
 
 extern struct Tokenizer *create_tokenizer(char *);

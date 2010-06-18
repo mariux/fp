@@ -127,13 +127,13 @@ void find_variables(struct Node *root, char **var)
             find_variables(root->data.con.condition, var);
             find_variables(root->data.con.true, var);
             find_variables(root->data.con.false, var);
-        break;
+            break;
         
         case OPERATOR:
             /* traverse tree */
             find_variables(root->data.op.left, var);
             find_variables(root->data.op.right, var);
-        break;
+            break;
         
         case VARIABLE:
             for(i = *var; *i != '\0'; i++)
@@ -149,7 +149,7 @@ void find_variables(struct Node *root, char **var)
             (*var)[strlen(*var)] = root->data.name;
             
             (*var)[strlen(*var) + 1] = '\0';
-        break;
+            break;
     }
 }
 
@@ -180,7 +180,7 @@ int has_variables(struct Node *root)
                 break;
             
             ret = has_variables(root->data.con.false);
-        break;
+            break;
         
         case OPERATOR:
             ret = has_variables(root->data.op.left);
@@ -189,12 +189,12 @@ int has_variables(struct Node *root)
                 break;
             
             ret = has_variables(root->data.op.right);
-        break;
+            break;
         
         case VARIABLE:
             /* leaf is a variable */
             return(1);
-        break;
+            break;
     }
     
     return(ret);
@@ -216,19 +216,19 @@ void replace(char b, struct Node **root, struct Node *n)
             replace(b, &((*root)->data.con.condition), n);
             replace(b, &((*root)->data.con.true), n);
             replace(b, &((*root)->data.con.false), n);
-        break;
+            break;
         
         case OPERATOR:
             /* traverse tree */
             replace(b, &((*root)->data.op.left), n);
             replace(b, &((*root)->data.op.right), n);
-        break;
+            break;
         
         case VARIABLE:
             /* check variable */
             if((*root)->data.name == b)
                 *root = memcpy(*root, n, sizeof(struct Node));
-        break;
+            break;
     }
 }
 
@@ -431,7 +431,7 @@ void reduce(struct Node *root)
                     delete_list_without_nodes(numbers);
                     delete_list_without_nodes(variables);
                     delete_list_without_nodes(all);
-                break;
+                    break;
                 
                 case MINUS:
                     if(left->type == NUMBER && right->type == NUMBER) {
@@ -471,7 +471,7 @@ void reduce(struct Node *root)
                         break;
                     
                     delete_list_without_nodes(all);
-                break;
+                    break;
                 
                 case MULTIPLY:
                     if(left->type == NUMBER && right->type == NUMBER) {
@@ -518,7 +518,7 @@ void reduce(struct Node *root)
                         break;
                     
                     delete_list_without_nodes(all);
-                break;
+                    break;
                 
                 case DIVIDE:
                     if(left->type == NUMBER && right->type == NUMBER) {
@@ -574,7 +574,7 @@ void reduce(struct Node *root)
                         break;
                     
                     delete_list_without_nodes(all);
-                break;
+                    break;
                 
                 case POWER:
                     if(left->type == NUMBER && right->type == NUMBER) {
@@ -621,7 +621,7 @@ void reduce(struct Node *root)
                         break;
                     
                     delete_list_without_nodes(all);
-                break;
+                    break;
                 
                 case E_SYMBOL:
                     if(left->type == NUMBER && right->type == NUMBER) {
@@ -629,7 +629,7 @@ void reduce(struct Node *root)
                         root->data.value = left->data.value * pow(10.0, right->data.value);
                         break;
                     }
-                break;
+                    break;
             }
         break;
         
@@ -655,7 +655,7 @@ void reduce(struct Node *root)
                     delete_node(right);
                 }
             }
-        break;
+            break;
     }
 }
 
@@ -744,7 +744,7 @@ int main(int argc, char *argv[])
             case 'f':
                 filename = optarg;
                 fromfile = 1;
-            break;
+                break;
             
             /* get precision */
             case 'p':
@@ -757,13 +757,13 @@ int main(int argc, char *argv[])
                     precision = 65;
                 
                 i = 3;
-            break;
+                break;
             
             /* print help */
             case 'h':
                 print_usage();
                 return(1);
-            break;
+                break;
             
             /* wrong arguments */
             case '?':
@@ -773,7 +773,7 @@ int main(int argc, char *argv[])
                     printf("unknown option %c!\n", optopt);
                 
                 return(1);
-            break;
+                break;
         }
     }
     
