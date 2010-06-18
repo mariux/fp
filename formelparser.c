@@ -2,7 +2,6 @@
     formelparser - formelparser.c
 
     Copyright (C) 2010 Matthias Ruester
-    Copyright (C) 2010 Max Planck Institut for Molecular Genetics
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,68 +17,34 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/* includes */
 #include <stdio.h>  /* for printf/scanf/fopen/... */
 #include <string.h> /* for strcmp/strlen */
-#include <stdlib.h> /* for exit */
+#include <stdlib.h>
 #include <limits.h> /* for MAX_INPUT/LINE_MAX */
 #include <math.h>   /* for pow */
 #include <unistd.h> /* for getopt/optopt/optarg */
 #include <ctype.h>  /* isdigit() */
 
-/* own header files */
-#include "node.h"
-#include "tokens.h"
-#include "list.h"
 
-/* macros */
-#define CURRENT_TOKEN (*(tokens->current))
-#define SKIP_TOKEN  next_char(tokens)
-#define GRAMMAR_PARSER(X) struct Node *X(struct Tokens *tokens)
 /* #define DEBUG */
 
-/* functions */
-int isvariable(char c);
+/*
+ * own includes
+ */
+
+#include "node.h"
+#include "list.h"
+#include "grammar.h"
+/*
+ * functions
+ */
 int isoperator(char c);
-GRAMMAR_PARSER(T);
-GRAMMAR_PARSER(S);
-GRAMMAR_PARSER(P);
-GRAMMAR_PARSER(O);
-GRAMMAR_PARSER(K);
-GRAMMAR_PARSER(Num);
-GRAMMAR_PARSER(N);
-GRAMMAR_PARSER(Z);
-GRAMMAR_PARSER(Var);
-GRAMMAR_PARSER(B);
-struct Node *create_parse_tree(struct Tokens *tokens);
+int isbracket(char c);
+
 long double calculate_parse_tree(struct Node *root);
+int count_numerics(int number);
 void reduce(struct Node *root);
 void print_usage();
-
-/*
- * Grammar:
- * T   -> S | S ? S : S
- * S   -> P | P + P | P - P
- * P   -> O | O * O | O / O | OVar
- * O   -> K | K ^ K
- * K   -> -K | (T) | Num | Var
- * Num -> N | N 'E' Z | N 'E' - Z
- * N   -> Z | Z . Z
- * Z   -> [0-9]+
- * Var -> B | BZ
- * B   -> [a-z]
- */
-
-/*
- * function checks if a character is a variable
- * 1. argument: a character
- * return value: 0 if character is not a variable
- *               1 if character is a variable
- */
-int isvariable(char c)
-{
-    return(c >= 'a' && c <= 'z');
-}
 
 /*
  * function checks if a character is a operator
@@ -92,439 +57,20 @@ int isoperator(char c)
     return(atoo(c) != ERROR);
 }
 
-/*
- * function for conditional expression operators
- * T -> S | S '?' S ':' S
- */
-GRAMMAR_PARSER(T)
-{
-    struct Node *condition, 
-                *true, 
-                *false;
-    
-    /* T -> S */
-    condition = S(tokens);
-    
-    if(!condition) {
-        /* syntax error in S -> return error */
-        return(NULL);
-    }
-    
-    /* T -> S '?' S ':' S */
-    while(CURRENT_TOKEN == '?') {
-        SKIP_TOKEN;
-        
-        true = S(tokens);
-        
-        if(!true) {
-            /* syntax error in S -> cleanup -> return error */
-            delete_tree(condition);
-            return(NULL);            
-        }
-        
-        if(CURRENT_TOKEN != ':') {
-            /* local syntax error -> cleanup -> return error */
-            delete_tree(true);
-            delete_tree(condition);
-            return(NULL);
-        }
-        
-        SKIP_TOKEN;
-        
-        false = S(tokens);
-        
-        if(!false) {
-            /* syntax error in S -> cleanup -> return error */
-            delete_tree(condition);
-            delete_tree(true);
-            return(NULL);
-        }
-
-        condition = new_conditional_node(condition, true, false);
-    }
-    
-    return(condition);
-}
 
 /*
- * function for addition and subtraction signs
- * S -> P | P '+' P | P '-' P
+ * function counts the numerics of a number
+ * 1. argument: a number
+ * return value: number of numerics
  */
-GRAMMAR_PARSER(S)
+int count_numerics(int number)
 {
-    struct Node *subtree, 
-                *right, 
-                *op;
+    int count;
     
-    /* S -> P */
-    subtree = P(tokens);
+    for(count = 0; number > 0; count++)
+        number /= 10;
     
-    if(!subtree)
-        return(NULL);
-    
-    /* S -> P '+' P | P '-' P */
-    while(CURRENT_TOKEN == '+' || CURRENT_TOKEN == '-') {
-        op = new_operator_node(CURRENT_TOKEN);
-        
-        SKIP_TOKEN;
-        
-        /* S -> P */
-        right = P(tokens);
-        
-        if(!right) {
-            /* cleanup and return Error */
-            delete_node(op);
-            delete_tree(subtree);
-            return(NULL);
-        }
-        
-        subtree = set_childs(op, subtree, right);
-    }
-    
-    return(subtree);
-}
-
-/*
- * function for multiplication and division signs
- * P -> O | O '*' O | O '/' O | OVar
- */
-GRAMMAR_PARSER(P)
-{
-    struct Node *subtree, *right, *op;
-    
-    /* P -> O */
-    subtree = O(tokens);
-    
-    if(!subtree)
-        return(NULL);
-    
-    /* P -> OVar */
-    while(isvariable(CURRENT_TOKEN)) {
-        right = Var(tokens);
-        
-        if(!right) {
-            delete_node(subtree);
-            return(NULL);
-        }
-        
-        subtree = set_childs(new_operator_node('*'),
-                             subtree, right);
-    }
-    
-    /* P -> O '*' O | O '/' O */
-    while(CURRENT_TOKEN == '*' || CURRENT_TOKEN == '/') {
-        op = new_operator_node(CURRENT_TOKEN);
-        
-        SKIP_TOKEN;
-        
-        /* P -> O */
-        right = O(tokens);
-        
-        if(!right) {
-            delete_node(op);
-            delete_tree(subtree);
-            return(NULL);
-        }
-        
-        subtree = set_childs(op, subtree, right);
-    }
-    
-    return(subtree);
-}
-
-/*
- * function for exponentiations
- * O -> K | K '^' K
- */
-GRAMMAR_PARSER(O)
-{
-    struct Node *subtree, *right;
-    
-    /* O -> K */
-    subtree = K(tokens);
-    
-    if(!subtree)
-        return(NULL);
-    
-    /* O -> K '^' K */
-    while(CURRENT_TOKEN == '^') {
-        SKIP_TOKEN;
-        
-        /* O -> K */
-        right = K(tokens);
-        
-        if(!right) {
-            delete_tree(subtree);
-            return(NULL);
-        }
-        
-        subtree = set_childs(new_operator_node('^'),
-                             subtree, right);
-    }
-    
-    return(subtree);
-}
-
-/*
- * function for signed terms, braces, numbers and variables
- * K -> -K | (T) | Num | Var
- */
-GRAMMAR_PARSER(K)
-{
-    struct Node *subtree;
-    
-    /* K -> -K */
-    if(CURRENT_TOKEN == '-') {
-        SKIP_TOKEN;
-
-        subtree = K(tokens);
-
-        if(!subtree)
-            return(NULL);
-
-        subtree  = set_childs(new_operator_node('*'),
-                              new_number_node(-1),
-                              subtree);
-        return(subtree);
-    }
-
-    /* K -> (T) */
-    if(CURRENT_TOKEN == '(') {
-        SKIP_TOKEN;
-        
-        subtree = T(tokens);
-        
-        if(!subtree)
-            return(NULL);
-        
-        if(CURRENT_TOKEN == ')') {
-            SKIP_TOKEN;
-            return(subtree);
-        }
-        
-        /* cleanup and return Error */
-        delete_tree(subtree);
-        return(NULL);
-    }
-    
-    
-    /* K -> Num */
-    if(isdigit(CURRENT_TOKEN)) {
-        subtree = Num(tokens); 
-        return(subtree);
-    }
-    
-    /* K -> Var */
-    if(isvariable(CURRENT_TOKEN)) {
-        subtree = Var(tokens);
-        return(subtree);
-    }
-    
-    /* Syntax Error */
-    return(NULL);
-}
-
-/*
- * function for numbers (maybe with an "E")
- * Num -> N | N 'E' Z | N 'E' '-' Z
- */
-GRAMMAR_PARSER(Num)
-{
-    struct Node *subtree, *right;
-    
-    /* Num -> N */
-    subtree = N(tokens);
-    
-    if(!subtree)
-        return(NULL);
-    
-    /* Num -> N 'E' Z */
-    if(CURRENT_TOKEN == 'E') {
-        /* skip E symbol */
-        SKIP_TOKEN;        
-        
-        /* Num -> N 'E' '-' Z */
-        if(CURRENT_TOKEN == '-') {
-            /* skip subtraction sign */
-            SKIP_TOKEN;            
-            
-            /* get number */
-            right = Z(tokens);
-            
-            if(!right) {
-                delete_tree(subtree);
-                return(NULL);
-            }
-            
-            right = set_childs(new_operator_node('*'),
-                                  new_number_node(-1), right);
-            
-            subtree = set_childs(new_operator_node('E'),
-                                 subtree, right);
-        } else {
-            /* Num -> N 'E' Z */
-            right = Z(tokens);
-            
-            if(!right) {
-                delete_tree(subtree);
-                return(NULL);
-            }
-            
-            subtree = set_childs(new_operator_node('E'),
-                                 subtree, right);
-        }
-    }
-    
-    return(subtree);
-}
-
-/*
- * function for numbers
- * N -> Z | Z '.' Z
- */
-GRAMMAR_PARSER(N)
-{
-    struct Node *subtree;
-    long double nr;
-    int digits;
-    
-    /* N -> Z */
-    /* get natural number */
-    subtree = Z(tokens);
-    
-    if(!subtree)
-        return(NULL);
-    
-    /* N -> Z '.' Z */
-    if(CURRENT_TOKEN == '.' || CURRENT_TOKEN == ',') {
-        /* skip point */
-        SKIP_TOKEN;        
-
-        /* get floating point number */
-        nr = subtree->data.value;
-        digits = 0;
-        
-        while(isdigit(CURRENT_TOKEN)) {
-            digits++;
-            
-            nr += (CURRENT_TOKEN - '0') / pow(10.0, digits);
-            
-            SKIP_TOKEN;
-        }
-        
-        subtree->data.value = nr;
-    }
-    
-    return(subtree);
-}
-
-/*
- * function for digits or rather natural numbers
- * Z -> [0-9]+
- */
-GRAMMAR_PARSER(Z)
-{
-    struct Node *subtree;
-    long double number;
-    
-    subtree = NULL;
-    number  = 0.0;
-    
-    if(!isdigit(CURRENT_TOKEN))
-        return(NULL);
-    
-    /* Z -> [0-9]+ */
-    /* get natural number */
-    while(isdigit(CURRENT_TOKEN)) {
-        number = number * 10.0 + (CURRENT_TOKEN - '0');
-        
-        SKIP_TOKEN;
-    }
-    
-    subtree = new_number_node(number);
-    
-    return(subtree);
-}
-
-/*
- * function for variables
- * Var -> B | BZ
- */
-GRAMMAR_PARSER(Var)
-{
-    struct Node *subtree, *subtree2, *op;
-    
-    /* get variable */
-    subtree = B(tokens);
-        
-    if(!subtree)
-        return(NULL);
-    
-    /* BZ */
-    if(isdigit(CURRENT_TOKEN)) {
-        /* get natural number */
-        subtree2 = Z(tokens);
-        
-        if(!subtree2) {
-            delete_tree(subtree);
-            return(NULL);
-        }
-        
-        op      = new_operator_node('^');
-        subtree = set_childs(op, subtree, subtree2);
-    }
-    
-    return(subtree);
-}
-
-/*
- * function for characters
- * B -> [a-z]
- */
-GRAMMAR_PARSER(B)
-{
-    struct Node *subtree;
-    
-    subtree = NULL;
-    
-    /* get character */
-    if(isvariable(CURRENT_TOKEN)) {
-        subtree = new_variable_node(CURRENT_TOKEN);
-        
-        SKIP_TOKEN;
-    }
-    
-    return(subtree);
-}
-
-/*
- * function creates a parse tree from a string
- * 1. argument: tokens of a string
- * return value: the parse tree
- */
-struct Node *create_parse_tree(struct Tokens *tokens)
-{
-    struct Node *parse_tree;
-    
-    tokens->current = tokens->str;
-    
-    parse_tree = T(tokens);
-    
-    if(CURRENT_TOKEN != '\0') {
-
-#ifdef DEBUG
-        print_tree(parse_tree);
-#endif
-
-        printf("syntax error at position %d near '%c'\n", tokens->i, CURRENT_TOKEN);
-        delete_tree(parse_tree);
-        return(NULL);
-    }
-    
-    if(CURRENT_TOKEN == '\0' && parse_tree == NULL)
-        printf("syntax error at end of term\n");
-    
-    return(parse_tree);
+    return(count);
 }
 
 /*
@@ -542,7 +88,7 @@ long double calculate_parse_tree(struct Node *root)
         break;
         
         case OPERATOR:
-            left = calculate_parse_tree(root->data.op.left);
+            left  = calculate_parse_tree(root->data.op.left);
             right = calculate_parse_tree(root->data.op.right);
             
             switch(root->data.op.operator) {
@@ -710,7 +256,6 @@ void replace_variables(struct Node **root)
 {
     char *variables, *i;
     char input[MAX_INPUT];
-    struct Tokens *tokens;
     struct Node *value;
     
     while(has_variables(*root)) {
@@ -732,11 +277,8 @@ void replace_variables(struct Node **root)
             printf("value of variable %c: ", *i);
             scanf("%s", input);
             
-            /* create tokens of input */
-            tokens = new_string(input);
-            
             /* create parse tree */
-            value = create_parse_tree(tokens);
+            value = parse(input);
             
             if(value == NULL)
                 i--;
@@ -747,9 +289,6 @@ void replace_variables(struct Node **root)
             replace(*i, root, value);
             
             delete_node(value);
-            
-            /* free memory of tokens */
-            delete_string(tokens);
         }
         
         /* free memory of string */
@@ -1192,7 +731,6 @@ void print_usage()
 
 int main(int argc, char *argv[])
 {
-    struct Tokens *tokens;
     struct Node *parse_tree;
     long double result;
     int i, fromfile;
@@ -1280,37 +818,31 @@ int main(int argc, char *argv[])
             continue;
         }
         
-        /* create tokens */
-        if((tokens = new_string(term)) == NULL)
-            printf("cannot create tokens for %s\n", term);
-        
         /* create parse tree */
-        if((parse_tree = create_parse_tree(tokens)) == NULL) {
+        if((parse_tree = parse(term)) == NULL) {
             printf("cannot create parse tree for %s\n", term);
             i++;
-            free(tokens->str);
-            free(tokens);
             continue;
         } else {
             /*
-            printf("before sorting:\n");
+            printf("vor Sortierung:\n");
             print_formula(parse_tree, 2);
             
             sort_tree(parse_tree);
             
-            printf("after sorting:\n");
+            printf("nach Sortierung:\n");
             print_formula(parse_tree, 2);
             */
             
             /*
-            printf("before reducing: ");
+            printf("vorher: ");
             print_formula(parse_tree, precision);
             */
             
             reduce(parse_tree);
             
             /*
-            printf("after reducing: ");
+            printf("nachher: ");
             print_formula(parse_tree, precision);
             */
             
@@ -1338,8 +870,6 @@ int main(int argc, char *argv[])
         i++;
         
         /* free memory of tokens */
-        free(tokens->str);
-        free(tokens);
     } while(fromfile ? (fscanf(file, "%s\n", read) != EOF) : (argv[i] != NULL));
     
     /* close file */
