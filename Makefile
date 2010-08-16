@@ -11,9 +11,6 @@ formelparser: $(OBJECTS)
 %.o: %.c
 	$(CC) -c $(CFLAGS) $<
 
-debug:
-	time valgrind -v --leak-check=full --show-reachable=yes --smc-check=all ./formelparser $(ARG)
-
 clean:
 	rm -f $(OBJECTS)
 	rm -f formelparser
