@@ -349,6 +349,7 @@ static GRAMMAR_PARSER(Num)
             
             subtree = set_childs(new_operator_node('E'),
                                  subtree, right);
+            printf("subtree->right = %Lf\n", subtree->data.op.right->data.value);
         }
     }
     

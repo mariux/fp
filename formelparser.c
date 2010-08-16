@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <ctype.h>
 
-/* #define DEBUG */
+#define DEBUG
 
 #include "node.h"
 #include "list.h"
@@ -259,6 +259,8 @@ void reduce(struct Node *root)
             
             if(left == NULL || right == NULL)
                 return;
+            
+            printf("left: %Lf right: %Lf\n", left->data.value, right->data.value);
             
             switch(root->data.op.operator) {
                 case ADD:
@@ -626,7 +628,11 @@ void reduce(struct Node *root)
                 case E_SYMBOL:
                     if(left->type == NUMBER && right->type == NUMBER) {
                         root->type = NUMBER;
+                        printf("%Lf %Lf\n", left->data.value, right->data.value);
                         root->data.value = left->data.value * pow(10.0, right->data.value);
+                        printf("%f\n", pow(10.0, right->data.value));
+                        delete_node(left);
+                        delete_node(right);
                         break;
                     }
                     break;
@@ -681,7 +687,7 @@ void replace_variables(struct Node **root)
         find_variables(*root, &variables);
 
 #ifdef DEBUG
-        print_tree(*root);
+        print_formula(*root, 10);
 #endif
 
         for(i = variables; *i != '\0'; i++) {
@@ -710,8 +716,9 @@ void replace_variables(struct Node **root)
 
 void print_usage()
 {
-    printf("usage: formelparser [FORMULA]...\n");
-    printf("possible options:\n\t-f [FILE]\n\t-p [PRECISION]\n");
+    printf("usage: formelparser [OPTIONS] FORMULA...\n");
+    printf("possible options:\n\t-f [FILE]\tread folmulas from file\n");
+    printf("\t-p [PRECISION]\tset the precision of the output\n");
 }
 
 int main(int argc, char *argv[])

@@ -760,7 +760,8 @@ void sort_tree(struct Node *root)
             
             if(root->data.op.operator == MINUS
                || root->data.op.operator == DIVIDE
-               || root->data.op.operator == POWER)
+               || root->data.op.operator == POWER
+               || root->data.op.operator == E_SYMBOL)
                 return; /* do not sort */
             
             variables = new_list();

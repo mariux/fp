@@ -85,5 +85,6 @@ extern void print_formula(struct Node *, int);
 extern void sort_tree(struct Node *);
 extern struct List *get_operands(struct Node *, int);
 extern void update(struct Node *);
+extern void print_tree(struct Node *root);
 
 #endif /* FORMELPARSER_NODE_H */
