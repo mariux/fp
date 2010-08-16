@@ -799,6 +799,9 @@ int main(int argc, char *argv[])
             term = read;
         else
             term = argv[i];
+
+        if(term == NULL)
+            break;
         
         /* empty string */
         if(strlen(term) == 0) {
