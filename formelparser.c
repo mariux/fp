@@ -741,7 +741,7 @@ int main(int argc, char *argv[])
     }
     
     /* read arguments */
-    while((c = getopt(argc, argv, "f:p:h")) != -1) {
+    while((c = getopt(argc, argv, "f:p:h-0123456789E^*/+-")) != -1) {
         switch(c) {
             /* get file name */
             case 'f':
@@ -773,7 +773,7 @@ int main(int argc, char *argv[])
                 if(optopt == 'f' || optopt == 'p')
                     printf("option -%c requires an argument\n", optopt);
                 else
-                    printf("unknown option %c!\n", optopt);
+                    printf("unknown option %c!\n", c);
                 
                 return(1);
                 break;
