@@ -7,7 +7,7 @@ OBJECTS = node.o tokenizer.o list.o grammar.o formula.o main.o
 #PROJECT
 PROJECT  = formulaparser
 VERSION  = 0
-REVISION = 3
+REVISION = 4
 
 #PACKAGE
 TARDIR  = $(PROJECT)-$(VERSION).$(REVISION)
