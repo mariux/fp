@@ -5,7 +5,7 @@ LDFLAGS = -lm
 OBJECTS = node.o tokenizer.o list.o grammar.o formelparser.o main.o
 
 #PROJECT
-PROJECT  = formelparser
+PROJECT  = formulaparser
 VERSION  = 0
 REVISION = 3
 
