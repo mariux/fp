@@ -1,5 +1,5 @@
 README for the 'formula parser' project
-=====================================
+=======================================
 
 Project:
 * a parser and calculator for mathematical formulas
@@ -25,10 +25,10 @@ Project:
    B   -> [a-z]
 
 Build:
-* to compile the program just type make
+* to compile the program type 'make'
 
 Install:
-* to install the program just copy the binary to e.g. $HOME/bin
+* if you want to install the program just copy the binary to e.g. $HOME/bin
 
 Bugs:
 * please report bugs to ruester@molgen.mpg.de
