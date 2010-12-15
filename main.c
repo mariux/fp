@@ -1,5 +1,5 @@
 /*
-    formelparser - main.c
+    formula parser - main.c
 
     Copyright (C) 2010 Matthias Ruester <ruester@molgen.mpg.de>
     Copyright (C) 2010 Max Planck Institut for Molecular Genetics

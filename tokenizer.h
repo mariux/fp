@@ -1,5 +1,5 @@
 /*
-    formelparser - tokenizer.h
+    formula parser - tokenizer.h
 
     Copyright (C) 2010 Matthias Ruester <ruester@molgen.mpg.de>
     Copyright (C) 2010 Max Planck Institut for Molecular Genetics
