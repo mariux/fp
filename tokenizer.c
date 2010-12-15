@@ -26,45 +26,45 @@
 
 void next_token(struct Tokenizer *tokenizer)
 {
-    if(tokenizer->current_token == NULL)
+    if (tokenizer->current_token == NULL)
         return;
-    
+
     tokenizer->current_token++;
-    
-    if(CURRENT_TOKEN == '\0')
+
+    if (CURRENT_TOKEN == '\0')
         return;
-    
-    while(CURRENT_TOKEN == ' ')
+
+    while (CURRENT_TOKEN == ' ')
         tokenizer->current_token++;
-    
+
     tokenizer->position++;
 }
 
 struct Tokenizer *create_tokenizer(char *string)
 {
     struct Tokenizer *tokenizer;
-    
-    if(string == NULL)
-        return(NULL);
-        
+
+    if (string == NULL)
+        return (NULL);
+
     tokenizer = malloc(sizeof(struct Tokenizer));
-    
-    if(!tokenizer) {
+
+    if (!tokenizer) {
         perror("malloc(tokenizer)");
         exit(EXIT_FAILURE);
     }
-    
+
     tokenizer->string = strdup(string);
-    
-    if(!(tokenizer->string)) {
+
+    if (!(tokenizer->string)) {
         perror("strdup");
         exit(EXIT_FAILURE);
     }
-    
+
     tokenizer->current_token = tokenizer->string;
-    tokenizer->position      = 1;
-    
-    return(tokenizer);
+    tokenizer->position = 1;
+
+    return (tokenizer);
 }
 
 void free_tokenizer(struct Tokenizer *t)

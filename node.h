@@ -39,7 +39,7 @@
 #define ERROR 10
 
 struct Operator {
-    int          operator;
+    int operator;
     struct Node *left;
     struct Node *right;
 };
@@ -52,28 +52,30 @@ struct Conditional {
 
 union Data {
     long double value;
-    
+
     char name;
-    
+
     struct Conditional con;
     struct Operator op;
 };
 
 struct Node {
-    int   type;
+    int type;
     char *formula;
-    
+
     union Data data;
 };
 
 extern struct Node *new_operator_node(char);
 extern struct Node *new_variable_node(char);
 extern struct Node *new_number_node(double);
-extern struct Node *new_conditional_node(struct Node *, struct Node *, struct Node *);
+extern struct Node *new_conditional_node(struct Node *, struct Node *,
+                                         struct Node *);
 extern struct Node *new_node(void);
 extern void delete_node(struct Node *);
 extern void delete_tree(struct Node *);
-extern struct Node *set_childs(struct Node *, struct Node *, struct Node *);
+extern struct Node *set_childs(struct Node *, struct Node *,
+                               struct Node *);
 extern char otoa(int);
 extern int atoo(char);
 extern int cmp_nodes(struct Node *, struct Node *);

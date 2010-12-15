@@ -47,120 +47,121 @@ int main(int argc, char *argv[])
     char read[LINE_MAX];
     char *term, *filename;
     FILE *file;
-    
+
     filename = term = NULL;
     fromfile = just_print = skip = 0;
     i = 1;
     precision = 5;
-    
+
     /* no arguments */
-    if(argc == 1) {
+    if (argc == 1) {
         print_usage();
         return (0);
     }
-    
+
     /* read arguments */
-    while((c = getopt(argc, argv, "f:p:hn")) != -1) {
-        switch(c) {
+    while ((c = getopt(argc, argv, "f:p:hn")) != -1) {
+        switch (c) {
             /* get file name */
-            case 'f':
-                filename = optarg;
-                fromfile = 1;
-                break;
-            
-            case 'n':
-                just_print = 1;
-                skip++;
-                break;
-            
+        case 'f':
+            filename = optarg;
+            fromfile = 1;
+            break;
+
+        case 'n':
+            just_print = 1;
+            skip++;
+            break;
+
             /* get precision */
-            case 'p':
-                precision = atoi(optarg);
-                
-                if(precision < 0)
-                    precision = 0;
-                
-                if(precision > 65)
-                    precision = 65;
-                
-                i = 3;
-                break;
-            
+        case 'p':
+            precision = atoi(optarg);
+
+            if (precision < 0)
+                precision = 0;
+
+            if (precision > 65)
+                precision = 65;
+
+            i = 3;
+            break;
+
             /* print help */
-            case 'h':
-                print_usage();
-                return(1);
-                break;
-            
+        case 'h':
+            print_usage();
+            return (1);
+            break;
+
             /* wrong arguments */
-            case '?':
-                return(1);
-                break;
+        case '?':
+            return (1);
+            break;
         }
     }
-    
-    if(fromfile) {
+
+    if (fromfile) {
         /* open file */
-        if((file = fopen(filename, "r")) == NULL) {
+        if ((file = fopen(filename, "r")) == NULL) {
             perror("fopen");
             exit(EXIT_FAILURE);
         }
-        
+
         /* empty file */
-        if(fgets(read, LINE_MAX - 1, file) == NULL) {
+        if (fgets(read, LINE_MAX - 1, file) == NULL) {
             fclose(file);
-            return(0);
+            return (0);
         }
     }
-    
+
     do {
-        if(fromfile) {
+        if (fromfile) {
             term = read;
             term[strlen(term) - 1] = '\0';
         } else
             term = argv[i + skip];
 
-        if(term == NULL)
+        if (term == NULL)
             break;
-        
+
         /* empty string */
-        if(strlen(term) == 0) {
+        if (strlen(term) == 0) {
             i++;
             continue;
         }
-        
+
         /* create parse tree */
-        if((parse_tree = parse(term)) == NULL) {
+        if ((parse_tree = parse(term)) == NULL) {
             fprintf(stderr, "cannot create parse tree for %s\n", term);
             i++;
             continue;
         } else {
             reduce(parse_tree);
-            
+
             /* replace variables of tree */
             replace_variables(&parse_tree);
 
             reduce(parse_tree);
-            
+
             /* calculate value of parse tree */
             result = calculate_parse_tree(parse_tree);
-            
+
             /* print result */
-            if((argc == 2 && !fromfile) || just_print)
+            if ((argc == 2 && !fromfile) || just_print)
                 printf("%.*Lf\n", precision, result);
             else
                 printf("%s = %.*Lf\n", term, precision, result);
-            
+
             /* free memory of parse tree */
             delete_tree(parse_tree);
         }
-        
+
         i++;
-    } while(fromfile ? (fgets(read, LINE_MAX - 1, file) != NULL) : (argv[i] != NULL));
-    
+    } while (fromfile ? (fgets(read, LINE_MAX - 1, file) != NULL)
+             : (argv[i] != NULL));
+
     /* close file */
-    if(fromfile)
+    if (fromfile)
         fclose(file);
-    
-    return(0);
+
+    return (0);
 }
