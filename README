@@ -2,9 +2,33 @@ README for the 'formelparser' project
 =====================================
 
 Project:
-
-* a parser and calculator for mathematical formulas, including variables and the ternary operator
-* 
+* a parser and calculator for mathematical formulas
+* features:
+    - variables (a-z)
+    - the ternary operator '?'
+    - read formulas from file (line by line)
+    - a3  equals a ^ 3
+    - 3a  equals 3 * a
+    - 1E2 equals 1 * 10 ^ 2
+    - a ? b : c equals "IF a != 0 THEN return b ELSE return c"
+    - 'long double' precision
+* following grammar is implemented recursively:
+   T   -> S | S ? S : S
+   S   -> P | P + P | P - P
+   P   -> O | O * O | O / O | OVar
+   O   -> K | K ^ K
+   K   -> -K | (T) | Num | Var
+   Num -> N | N 'E' Z | N 'E' - Z
+   N   -> Z | Z . Z
+   Z   -> [0-9]+
+   Var -> B | BZ
+   B   -> [a-z]
 
 Build:
+* to compile the program just type make
 
+Install:
+* to install the program just copy the binary to e.g. $HOME/bin
+
+Bugs:
+* please report bugs to ruester@molgen.mpg.de

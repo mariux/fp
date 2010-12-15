@@ -1,5 +1,5 @@
 #COMPILING AND LINKING
-CC	= /usr/bin/gcc
+CC	= gcc
 CFLAGS	= -Wall -g -pedantic
 LDFLAGS = -lm
 OBJECTS = node.o tokenizer.o list.o grammar.o formelparser.o main.o
@@ -7,7 +7,7 @@ OBJECTS = node.o tokenizer.o list.o grammar.o formelparser.o main.o
 #PROJECT
 PROJECT  = formelparser
 VERSION  = 0
-REVISION = 1
+REVISION = 3
 
 #PACKAGE
 TARDIR  = $(PROJECT)-$(VERSION).$(REVISION)

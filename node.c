@@ -117,7 +117,7 @@ void delete_tree(struct Node *old)
 	    break;
         
         case ERROR:
-            printf("ERROR\n");
+            fprintf(stderr, "ERROR\n");
             break;
     }
     
@@ -324,39 +324,35 @@ void print_tree(struct Node *root)
             break;
         
         default:
-            printf("ERROR\n");
+            fprintf(stderr, "ERROR\n");
             break;
     }
 }
 
-long double my_fabs(long double d)
+static long double my_fabs(long double d)
 {
     return((d < 0) ? (-d) : (d));    
 }
 
-char *ldtostr(long double d)
+static char *ldtostr(long double d)
 {
     unsigned int digits;
     char *ret;
     long double h;
     
-    if(d == HUGE_VAL || d == -HUGE_VAL) {
+    if(d == HUGE_VAL || d == -HUGE_VAL)
         return(strdup("inf"));
-    }
     
-    if(d == 0.0) {
+    if(d == 0.0)
         digits = 1;
-    } else {
+    else
         digits = 0;
-    }
     
-    if(d < 0) {
+    if(d < 0)
         digits++;
-    }
     
-    for(h = d; my_fabs(h) > 0.0; h /= 10.0) {
+    for(h = d; my_fabs(h) > 0.0; h /= 10.0)
         digits++;
-    }
     
     /* digit-characters '.' precision-characters '\0' */
     if((ret = calloc(digits + 1 + 65 + 1, sizeof(char))) == NULL) {
@@ -509,7 +505,7 @@ char *get_formula(struct Node *root)
             break;
         
         default:
-            printf("ERROR\n");
+            fprintf(stderr, "ERROR\n");
             break;
     }
     
@@ -547,9 +543,8 @@ struct Node *get_parent(struct Node *root, struct Node *search)
 {
     struct Node *parent;
     
-    if(root == NULL) {
+    if(root == NULL)
         return(NULL);
-    }
     
     switch(root->type) {
         case OPERATOR:
@@ -560,15 +555,6 @@ struct Node *get_parent(struct Node *root, struct Node *search)
             if(root->data.op.left == search
                || root->data.op.right == search)
                 return(root);
-            break;
-        
-        case NUMBER:
-
-#ifdef DEBUG
-            if(root == search)
-                printf("match\n");
-#endif
-
             break;
         
         case CONDITIONAL:
@@ -604,7 +590,7 @@ int cmp_trees(struct Node *a, struct Node *b)
     return(!ret);
 }
 
-void sort_numbers(struct List *l)
+static void sort_numbers(struct List *l)
 {
     struct Element *current, *current2;
     long double temp;
@@ -628,7 +614,7 @@ void sort_numbers(struct List *l)
     }
 }
 
-void sort_variables(struct List *l)
+static void sort_variables(struct List *l)
 {
     struct Element *current, *current2;
     char temp;
@@ -652,7 +638,7 @@ void sort_variables(struct List *l)
     }
 }
 
-void sort_operators(struct List *l)
+static void sort_operators(struct List *l)
 {
     struct Element *current, *current2;
     struct Node *temp;
@@ -680,12 +666,12 @@ void sort_operators(struct List *l)
     delete_node(temp);
 }
 
-void sort_conditional(struct List *l)
+static void sort_conditional(struct List *l)
 {
     /* no idea */
 }
 
-void sort(struct Node *root, struct List *l, int operator)
+static void sort(struct Node *root, struct List *l, int operator)
 {
     if(root == NULL) {
         return;
@@ -703,7 +689,7 @@ void sort(struct Node *root, struct List *l, int operator)
             sort(root->data.op.right, l, operator);
             
             if(l->current == NULL) {
-                printf("ERROR\n");
+                fprintf(stderr, "ERROR\n");
                 exit(EXIT_FAILURE);
             }
             
@@ -717,7 +703,7 @@ void sort(struct Node *root, struct List *l, int operator)
             sort(root->data.op.left, l, operator);
             
             if(l->current == NULL) {
-                printf("ERROR\n");
+                fprintf(stderr, "ERROR\n");
                 exit(EXIT_FAILURE);
             }
             
@@ -731,7 +717,7 @@ void sort(struct Node *root, struct List *l, int operator)
         next_element(l);
 
         if(l->current == NULL) {
-            printf("ERROR\n");
+            fprintf(stderr, "ERROR\n");
             exit(EXIT_FAILURE);
         }
 
@@ -773,7 +759,7 @@ void sort_tree(struct Node *root)
             operands = get_operands(root, root->data.op.operator);
             
             if(operands == NULL) {
-                printf("ERROR\n");
+                fprintf(stderr, "ERROR\n");
                 exit(EXIT_FAILURE);
             }
             
@@ -911,7 +897,7 @@ void print_formula(struct Node *root, int precision)
             break;
         
         default:
-            printf("ERROR\n");
+            fprintf(stderr, "ERROR\n");
             break;
     }
     
@@ -921,7 +907,7 @@ void print_formula(struct Node *root, int precision)
         printf("\n");
 }
 
-void add_subtrees(struct Node *root, struct List *l, int operator)
+static void add_subtrees(struct Node *root, struct List *l, int operator)
 {
     if(root == NULL)
         return;
@@ -958,10 +944,6 @@ struct List *get_operands(struct Node *root, int operator)
     l = new_list();
     
     add_subtrees(root, l, operator);
-
-#ifdef DEBUG
-    print_list(l);
-#endif
 
     if(l->count == 0) {
         free(l);

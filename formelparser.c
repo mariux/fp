@@ -30,28 +30,6 @@
 #include "list.h"
 #include "grammar.h"
 
-/* checks if a character is a operator
- * 1. argument: a character
- * return value: 0 if character is not a operator
- *               1 if character is a operator */
-static int isoperator(char c)
-{
-    return(atoo(c) != ERROR);
-}
-
-/* counts the numerics of a number
- * 1. argument: a number
- * return value: number of numerics */
-static int count_numerics(int number)
-{
-    int count;
-    
-    for(count = 0; number > 0; count++)
-        number /= 10;
-    
-    return(count);
-}
-
 /* calculates the value of a parse tree
  * 1. argument: pointer of the parse tree
  * return value: the value of the parse tree */

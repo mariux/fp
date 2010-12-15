@@ -84,12 +84,10 @@ struct Node *parse(char *string)
  * N   -> Z | Z . Z
  * Z   -> [0-9]+
  * Var -> B | BZ
- * B   -> [a-z]
- */
+ * B   -> [a-z] */
  
 /* function for conditional expression operators
- * T -> S | S '?' S ':' S
- */
+ * T -> S | S '?' S ':' S */
 GRAMMAR_PARSER(T)
 {
     struct Node *condition, 
@@ -140,8 +138,7 @@ GRAMMAR_PARSER(T)
 }
 
 /* function for addition and subtraction signs
- * S -> P | P '+' P | P '-' P
- */
+ * S -> P | P '+' P | P '-' P */
 static GRAMMAR_PARSER(S)
 {
     struct Node *subtree, 
@@ -176,8 +173,7 @@ static GRAMMAR_PARSER(S)
 }
 
 /* function for multiplication and division signs
- * P -> O | O '*' O | O '/' O | OVar
- */
+ * P -> O | O '*' O | O '/' O | OVar */
 static GRAMMAR_PARSER(P)
 {
     struct Node *subtree, *right, *op;
@@ -222,8 +218,7 @@ static GRAMMAR_PARSER(P)
 }
 
 /* function for exponentiations
- * O -> K | K '^' K
- */
+ * O -> K | K '^' K */
 static GRAMMAR_PARSER(O)
 {
     struct Node *subtree, *right;
@@ -252,8 +247,7 @@ static GRAMMAR_PARSER(O)
 }
 
 /* function for signed terms, braces, numbers and variables
- * K -> -K | (T) | Num | Var
- */
+ * K -> -K | (T) | Num | Var */
 static GRAMMAR_PARSER(K)
 {
     struct Node *subtree;
@@ -309,8 +303,7 @@ static GRAMMAR_PARSER(K)
 }
 
 /* function for numbers (maybe with an 'E')
- * Num -> N | N 'E' Z | N 'E' '-' Z
- */
+ * Num -> N | N 'E' Z | N 'E' '-' Z */
 static GRAMMAR_PARSER(Num)
 {
     struct Node *subtree, *right;
@@ -363,8 +356,7 @@ static GRAMMAR_PARSER(Num)
 }
 
 /* function for numbers
- * N -> Z | Z '.' Z
- */
+ * N -> Z | Z '.' Z */
 static GRAMMAR_PARSER(N)
 {
     struct Node *subtree;
@@ -400,8 +392,7 @@ static GRAMMAR_PARSER(N)
 }
 
 /* function for digits
- * Z -> [0-9]+
- */
+ * Z -> [0-9]+ */
 static GRAMMAR_PARSER(Z)
 {
     struct Node *subtree;
@@ -425,8 +416,7 @@ static GRAMMAR_PARSER(Z)
 }
 
 /* function for variables
- * Var -> B | BZ
- */
+ * Var -> B | BZ */
 static GRAMMAR_PARSER(Var)
 {
     struct Node *subtree, *right;
@@ -453,8 +443,7 @@ static GRAMMAR_PARSER(Var)
 }
 
 /* function for characters
- * B -> [a-z]
- */
+ * B -> [a-z] */
 static GRAMMAR_PARSER(B)
 {
     struct Node *subtree;
