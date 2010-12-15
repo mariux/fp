@@ -94,11 +94,6 @@ int main(int argc, char *argv[])
             
             /* wrong arguments */
             case '?':
-                if(optopt == 'f' || optopt == 'p')
-                    printf("option -%c requires an argument\n", optopt);
-                else
-                    printf("unknown option %c!\n", c);
-                
                 return(1);
                 break;
         }
