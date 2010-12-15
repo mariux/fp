@@ -2,7 +2,7 @@
 CC	= gcc
 CFLAGS	= -Wall -g -pedantic
 LDFLAGS = -lm
-OBJECTS = node.o tokenizer.o list.o grammar.o formelparser.o main.o
+OBJECTS = node.o tokenizer.o list.o grammar.o formula.o main.o
 
 #PROJECT
 PROJECT  = formulaparser
@@ -15,7 +15,7 @@ TARFILE = $(TARDIR).tar
 
 all: $(PROJECT)
 
-formelparser: $(OBJECTS)
+$(PROJECT): $(OBJECTS)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 %.o: %.c

@@ -26,7 +26,7 @@
 
 #include "node.h"
 #include "grammar.h"
-#include "formelparser.h"
+#include "formula.h"
 
 void print_usage()
 {
@@ -43,13 +43,13 @@ int main(int argc, char *argv[])
     long double result;
     int i;
     short precision;
-    char fromfile, just_print, c;
+    char fromfile, just_print, skip, c;
     char read[LINE_MAX];
     char *term, *filename;
     FILE *file;
     
     filename = term = NULL;
-    fromfile = just_print = 0;
+    fromfile = just_print = skip = 0;
     i = 1;
     precision = 5;
     
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     }
     
     /* read arguments */
-    while((c = getopt(argc, argv, "f:p:hn-0123456789E^*/+-")) != -1) {
+    while((c = getopt(argc, argv, "f:p:hn")) != -1) {
         switch(c) {
             /* get file name */
             case 'f':
@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
             
             case 'n':
                 just_print = 1;
+                skip++;
                 break;
             
             /* get precision */
@@ -118,12 +119,11 @@ int main(int argc, char *argv[])
     }
     
     do {
-        if(fromfile)
+        if(fromfile) {
             term = read;
-        else
-            term = argv[i];
-        
-        term[strlen(term) - 1] = '\0';
+            term[strlen(term) - 1] = '\0';
+        } else
+            term = argv[i + skip];
 
         if(term == NULL)
             break;
