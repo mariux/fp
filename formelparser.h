@@ -1,5 +1,5 @@
 /*
-    formelparser - grammar.h
+    formelparser - formelparser.h
 
     Copyright (C) 2010 Matthias Ruester <ruester@molgen.mpg.de>
     Copyright (C) 2010 Max Planck Institut for Molecular Genetics
@@ -18,11 +18,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FORMELPARSER_GRAMMAR_H
-#define FORMELPARSER_GRAMMAR_H
+#ifndef FORMELPARSER_FORMELPARSER_H
+#define FORMELPARSER_FORMELPARSER_H
 
-#include "tokenizer.h"
-
-extern struct Node *parse(char *);
+extern void reduce(struct Node *);
+extern void replace_variables(struct Node **);
+extern long double calculate_parse_tree(struct Node *root);
 
 #endif

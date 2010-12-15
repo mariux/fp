@@ -2,7 +2,7 @@
 CC	= /usr/bin/gcc
 CFLAGS	= -Wall -g -pedantic
 LDFLAGS = -lm
-OBJECTS = node.o tokenizer.o list.o grammar.o formelparser.o
+OBJECTS = node.o tokenizer.o list.o grammar.o formelparser.o main.o
 
 #PROJECT
 PROJECT  = formelparser

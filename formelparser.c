@@ -19,36 +19,30 @@
 */
 
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <math.h>
-#include <unistd.h>
-#include <ctype.h>
 
-/* #define DEBUG */
+#include <limits.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+#include <ctype.h>
 
 #include "node.h"
 #include "list.h"
 #include "grammar.h"
 
-/*
- * function checks if a character is a operator
+/* checks if a character is a operator
  * 1. argument: a character
  * return value: 0 if character is not a operator
- *               1 if character is a operator
- */
-int isoperator(char c)
+ *               1 if character is a operator */
+static int isoperator(char c)
 {
     return(atoo(c) != ERROR);
 }
 
-/*
- * function counts the numerics of a number
+/* counts the numerics of a number
  * 1. argument: a number
- * return value: number of numerics
- */
-int count_numerics(int number)
+ * return value: number of numerics */
+static int count_numerics(int number)
 {
     int count;
     
@@ -58,11 +52,9 @@ int count_numerics(int number)
     return(count);
 }
 
-/*
- * funtion calculates the value of a parse tree
+/* calculates the value of a parse tree
  * 1. argument: pointer of the parse tree
- * return value: the value of the parse tree
- */
+ * return value: the value of the parse tree */
 long double calculate_parse_tree(struct Node *root)
 {
     long double left, right;
@@ -108,15 +100,13 @@ long double calculate_parse_tree(struct Node *root)
     return(0);
 }
 
-/*
- * function finds all variables in a tree
+/* finds all variables in a tree
  * and save them in the 2nd argument
  * 1. argument: pointer of the tree
  * 2. argument: adress of the pointer of a string
  *              (first call with empty string)
- * return value: none
- */
-void find_variables(struct Node *root, char **var)
+ * return value: none */
+static void find_variables(struct Node *root, char **var)
 {
     char *i;
     
@@ -153,13 +143,11 @@ void find_variables(struct Node *root, char **var)
     }
 }
 
-/*
- * function searches a tree for variables
+/* searches a tree for variables
  * 1. argument: pointer of the tree
  * return value: 0 if tree has no variables
- *               1 if tree has variables
- */
-int has_variables(struct Node *root)
+ *               1 if tree has variables */
+static int has_variables(struct Node *root)
 {
     int ret;
     
@@ -200,14 +188,12 @@ int has_variables(struct Node *root)
     return(ret);
 }
 
-/*
- * function replaces one specific variable in a tree
+/* replaces one specific variable in a tree
  * 1. argument: variable
  * 2. argument: adress of the pointer of the tree
  * 3. argument: value of the variable (as a node)
- * return value: none
- */
-void replace(char b, struct Node **root, struct Node *n)
+ * return value: none */
+static void replace(char b, struct Node **root, struct Node *n)
 {
     /* check type of node */
     switch((*root)->type) {
@@ -232,6 +218,9 @@ void replace(char b, struct Node **root, struct Node *n)
     }
 }
 
+/* remove trivial things like "0 * a" or "b - b"
+ * 1. argument: pointer of the tree
+ * return value: none */
 void reduce(struct Node *root)
 {
     struct Node *left, *right, *old,
@@ -299,11 +288,6 @@ void reduce(struct Node *root)
                     }
                     
                     all = get_operands(root, ADD);
-                    
-                    /*
-                    printf("all:\n");
-                    print_list(all);
-                    */
                     
                     if(all == NULL)
                         break;
@@ -661,8 +645,7 @@ void reduce(struct Node *root)
     }
 }
 
-/* 
- * function replaces all variables in a tree by asking the user for values
+/* replace all variables in a tree by asking the user for values
  * 1. argument: adress of the pointer of the tree
  * return value: none
  */
@@ -682,20 +665,20 @@ void replace_variables(struct Node **root)
         /* find all variables in tree */
         find_variables(*root, &variables);
 
-#ifdef DEBUG
-        print_tree(*root);
-#endif
-
         for(i = variables; *i != '\0'; i++) {
             /* ask for value of variable */
             printf("value of variable %c: ", *i);
-            scanf("%s", input);
+            fgets(input, MAX_INPUT - 1, stdin);
+            input[strlen(input) - 1] = '\0';
             
             /* create parse tree */
             value = parse(input);
             
-            if(value == NULL)
+            if(value == NULL) {
+                fprintf(stderr, "cannot create parse tree\n");
                 i--;
+                continue;
+            }
             
             reduce(value);
             
@@ -708,162 +691,4 @@ void replace_variables(struct Node **root)
         /* free memory of string */
         free(variables);
     }
-}
-
-void print_usage()
-{
-    printf("usage: formelparser [OPTIONS] FORMULA...\n");
-    printf("possible options:\n\t-f [FILE]\tread folmulas from file\n");
-    printf("\t-p [PRECISION]\tset the precision of the output\n");
-}
-
-int main(int argc, char *argv[])
-{
-    struct Node *parse_tree;
-    long double result;
-    int i, fromfile;
-    short precision;
-    char c;
-    char read[LINE_MAX];
-    char *term, *filename;
-    FILE *file;
-    
-    filename = NULL;
-    fromfile = 0;
-    term = NULL;
-    i = 1;
-    precision = 5;
-    
-    /* no arguments */
-    if(argc == 1) {
-        print_usage();
-        return(1);
-    }
-    
-    /* read arguments */
-    while((c = getopt(argc, argv, "f:p:h-0123456789E^*/+-")) != -1) {
-        switch(c) {
-            /* get file name */
-            case 'f':
-                filename = optarg;
-                fromfile = 1;
-                break;
-            
-            /* get precision */
-            case 'p':
-                precision = atoi(optarg);
-                
-                if(precision < 0)
-                    precision = 0;
-                
-                if(precision > 65)
-                    precision = 65;
-                
-                i = 3;
-                break;
-            
-            /* print help */
-            case 'h':
-                print_usage();
-                return(1);
-                break;
-            
-            /* wrong arguments */
-            case '?':
-                if(optopt == 'f' || optopt == 'p')
-                    printf("option -%c requires an argument\n", optopt);
-                else
-                    printf("unknown option %c!\n", c);
-                
-                return(1);
-                break;
-        }
-    }
-    
-    if(fromfile) {
-        /* open file */
-        if((file = fopen(filename, "r")) == NULL) {
-            perror("fopen");
-            exit(EXIT_FAILURE);
-        }
-        
-        /* empty file */
-        if(fscanf(file, "%s\n", read) == EOF) {
-            fclose(file);
-            return(0);
-        }
-    }
-    
-    do {
-        if(fromfile)
-            term = read;
-        else
-            term = argv[i];
-
-        if(term == NULL)
-            break;
-        
-        /* empty string */
-        if(strlen(term) == 0) {
-            i++;
-            continue;
-        }
-        
-        /* create parse tree */
-        if((parse_tree = parse(term)) == NULL) {
-            printf("cannot create parse tree for %s\n", term);
-            i++;
-            continue;
-        } else {
-            /*
-            printf("before sorting:\n");
-            print_formula(parse_tree, 2);
-            
-            sort_tree(parse_tree);
-            
-            printf("after sorting:\n");
-            print_formula(parse_tree, 2);
-            */
-            
-            /*
-            printf("before reducing: ");
-            print_formula(parse_tree, precision);
-            */
-            
-            reduce(parse_tree);
-            
-            /*
-            printf("after reducing: ");
-            print_formula(parse_tree, precision);
-            */
-            
-            /* check tree for variables */
-            if(has_variables(parse_tree))
-                /* replace variables of tree */
-                replace_variables(&parse_tree);
-
-#ifdef DEBUG
-            print_tree(parse_tree);
-#endif
-
-            reduce(parse_tree);
-            
-            /* calculate value of parse tree */
-            result = calculate_parse_tree(parse_tree);
-            
-            /* print result */
-            printf("%s = %.*Lf\n", term, precision, result);
-            
-            /* free memory of parse tree */
-            delete_tree(parse_tree);
-        }
-        
-        i++;
-    } while(fromfile ? (fscanf(file, "%s\n", read) != EOF) : (argv[i] != NULL));
-    
-    /* close file */
-    if(fromfile)
-        fclose(file);
-    
-    return(0);
 }

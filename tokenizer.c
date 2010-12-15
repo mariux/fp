@@ -24,8 +24,6 @@
 
 #include "tokenizer.h"
 
-/*****************************************************************************/
-
 void next_token(struct Tokenizer *tokenizer)
 {
     if(tokenizer->current_token == NULL)
@@ -41,8 +39,6 @@ void next_token(struct Tokenizer *tokenizer)
     
     tokenizer->position++;
 }
-
-/*****************************************************************************/
 
 struct Tokenizer *create_tokenizer(char *string)
 {
@@ -71,12 +67,8 @@ struct Tokenizer *create_tokenizer(char *string)
     return(tokenizer);
 }
 
-/*****************************************************************************/
-
 void free_tokenizer(struct Tokenizer *t)
 {
     free(t->string);
     free(t);
 }
-
-/*****************************************************************************/

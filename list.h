@@ -18,10 +18,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "node.h"
-
 #ifndef FORMELPARSER_LIST_H
 #define FORMELPARSER_LIST_H
+
+#include "node.h"
 
 struct List {
     struct Element *first;
@@ -44,4 +44,4 @@ extern void delete_list_without_nodes(struct List *);
 extern void rewind_list(struct List *);
 extern void next_element(struct List *);
 
-#endif /* FORMELPARSER_LIST_H*/
+#endif

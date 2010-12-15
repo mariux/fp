@@ -34,4 +34,4 @@ extern struct Tokenizer *create_tokenizer(char *);
 extern void next_token(struct Tokenizer *);
 extern void free_tokenizer(struct Tokenizer *);
 
-#endif /* FORMELPARSER_TOKENIZER_H */
+#endif
