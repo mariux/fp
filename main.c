@@ -1,8 +1,8 @@
 /*
     formelparser - main.c
 
-    Copyright (C) 2010 Matthias Ruester <ruester@molgen.mpg.de>
-    Copyright (C) 2010 Max Planck Institut for Molecular Genetics
+    Copyright (C) 2011 Matthias Ruester <ruester@molgen.mpg.de>
+    Copyright (C) 2011 Max Planck Institut for Molecular Genetics
 
     Formelparser is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,7 +30,11 @@
 
 void print_usage()
 {
-    printf("usage: formelparser [OPTIONS] FORMULA...\n"
+    printf("formelparser Copyright (C) 2011 Matthias Ruester\n"
+           "This program comes with ABSOLUTELY NO WARRANTY.\n"
+           "This is free software, and you are welcome to redistribute it\n"
+           "under certain conditions.\n\n"
+           "usage: formelparser [OPTIONS] FORMULA...\n"
            "possible options:\n"
            "    -f [FILE]         read folmulas from file\n"
            "    -p [PRECISION]    set the precision of the output\n"

@@ -1,8 +1,8 @@
 /*
     formelparser - tokenizer.h
 
-    Copyright (C) 2010 Matthias Ruester <ruester@molgen.mpg.de>
-    Copyright (C) 2010 Max Planck Institut for Molecular Genetics
+    Copyright (C) 2011 Matthias Ruester <ruester@molgen.mpg.de>
+    Copyright (C) 2011 Max Planck Institut for Molecular Genetics
 
     Formelparser is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
