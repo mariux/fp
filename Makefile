@@ -25,7 +25,7 @@ OBJECTS = node.o tokenizer.o list.o grammar.o formula.o main.o
 #PROJECT
 PROJECT  = formelparser
 VERSION  = 0
-REVISION = 5
+REVISION = 6
 
 #PACKAGE
 TARDIR  = $(PROJECT)-$(VERSION).$(REVISION)
