@@ -1,7 +1,6 @@
-README for the formelparser project
-=======================================
+formelparser project:
+=====================
 
-Project:
 * a parser and calculator for mathematical formulas
 * features:
     - variables (a-z)
