@@ -93,6 +93,7 @@ long double calculate_parse_tree(struct Node *root)
 static void find_variables(struct Node *root, char **var)
 {
     char *i;
+    size_t temp;
 
     /* check type of node */
     switch (root->type) {
@@ -114,15 +115,17 @@ static void find_variables(struct Node *root, char **var)
             if (*i == root->data.name)
                 return;
 
-        if ((*var = realloc(*var, (strlen(*var) + 2)
+        temp = strlen(*var);
+
+        if ((*var = realloc(*var, (temp + 2)
                             * sizeof(char))) == NULL) {
             perror("malloc");
             exit(EXIT_FAILURE);
         }
 
-        (*var)[strlen(*var)] = root->data.name;
+        (*var)[temp] = root->data.name;
 
-        (*var)[strlen(*var) + 1] = '\0';
+        (*var)[temp + 1] = '\0';
         break;
     }
 }
