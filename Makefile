@@ -17,8 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #COMPILING AND LINKING
-CC	= gcc
-CFLAGS	= -Wall -g -pedantic
+CC      = gcc
+CFLAGS  = -Wall -g -pedantic
 LDFLAGS = -lm
 OBJECTS = node.o tokenizer.o list.o grammar.o formula.o main.o
 
@@ -32,8 +32,8 @@ TARDIR  = $(PROJECT)-$(VERSION).$(REVISION)
 TARFILE = $(TARDIR).tar
 
 DESTDIR =
-PREFIX  =/usr/local
-BINDIR  =${PREFIX}/bin
+PREFIX  = /usr/local
+BINDIR  = ${PREFIX}/bin
 
 all: $(PROJECT)
 
