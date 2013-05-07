@@ -18,7 +18,7 @@
 
 #COMPILING AND LINKING
 CC      = gcc
-CFLAGS  = -Wall -g -pedantic
+CFLAGS  = -Wall -Wextra -g -pedantic
 LDFLAGS = -lm
 OBJECTS = node.o tokenizer.o list.o grammar.o formula.o main.o
 
