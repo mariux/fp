@@ -27,10 +27,7 @@ PROJECT  = fp
 VERSION  = 0
 REVISION = 7
 
-#PACKAGE
-TARDIR  = $(PROJECT)-$(VERSION).$(REVISION)
-TARFILE = $(TARDIR).tar
-
+#INSTALLATION
 DESTDIR =
 PREFIX  = /usr/local
 BINDIR  = ${PREFIX}/bin
@@ -46,14 +43,6 @@ $(PROJECT): $(OBJECTS)
 install: all
 	@mkdir -pv ${DESTDIR}${BINDIR}
 	@cp -vf ${PROJECT} ${DESTDIR}${BINDIR}
-
-package:
-	@rm -rf $(TARFILE) $(TARDIR) $(TARFILE).bz2
-	@mkdir $(TARDIR)
-	@cp -f *.c *.h Makefile LICENSE $(TARDIR)
-	@tar cf $(TARFILE) $(TARDIR)
-	@bzip2 -z9 $(TARFILE)
-	@rm -rf $(TARDIR)
 
 clean:
 	@rm -f $(OBJECTS) $(PROJECT)
