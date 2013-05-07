@@ -36,7 +36,7 @@ void print_usage()
            "under certain conditions.\n\n"
            "usage: fp [OPTIONS] FORMULA...\n"
            "possible options:\n"
-           "    -f [FILE]         read folmulas from file\n"
+           "    -f [FILE]         read formulas from file\n"
            "    -p [PRECISION]    set the precision of the output\n"
            "    -n                just print results\n");
 }
