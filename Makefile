@@ -25,7 +25,7 @@ OBJECTS = node.o tokenizer.o list.o grammar.o formula.o main.o
 #PROJECT
 PROJECT  = fp
 VERSION  = 0
-REVISION = 7
+REVISION = 8
 
 #INSTALLATION
 DESTDIR =
