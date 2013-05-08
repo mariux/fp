@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     }
 
     /* read arguments */
-    while ((c = getopt(argc, argv, "f:p:hn")) != -1) {
+    while ((c = getopt(argc, argv, "f:p:hn0123456789E^*/+-.?:()")) != -1) {
         switch (c) {
             /* get file name */
         case 'f':
@@ -93,11 +93,6 @@ int main(int argc, char *argv[])
             /* print help */
         case 'h':
             print_usage();
-            return (1);
-            break;
-
-            /* wrong arguments */
-        case '?':
             return (1);
             break;
         }
